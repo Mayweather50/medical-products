@@ -1,0 +1,48 @@
+package com.medicalproducts.backend.mapper;
+
+import com.medicalproducts.backend.dto.CategoryRequest;
+import com.medicalproducts.backend.dto.CategoryResponse;
+import com.medicalproducts.backend.dto.CategorySummaryResponse;
+import com.medicalproducts.backend.entity.Category;
+import org.springframework.stereotype.Component;
+
+@Component
+public class CategoryMapper {
+
+    public Category toEntity(CategoryRequest request) {
+        Category category = new Category();
+        applyRequest(category, request);
+        return category;
+    }
+
+    public void updateEntity(Category category, CategoryRequest request) {
+        applyRequest(category, request);
+    }
+
+    public CategoryResponse toResponse(Category category) {
+        return new CategoryResponse(
+                category.getId(),
+                category.getTitle(),
+                category.getSlug(),
+                category.getDescription(),
+                category.getImageUrl(),
+                category.getCreatedAt(),
+                category.getUpdatedAt()
+        );
+    }
+
+    public CategorySummaryResponse toSummary(Category category) {
+        return new CategorySummaryResponse(
+                category.getId(),
+                category.getTitle(),
+                category.getSlug()
+        );
+    }
+
+    private void applyRequest(Category category, CategoryRequest request) {
+        category.setTitle(request.title());
+        category.setSlug(request.slug());
+        category.setDescription(request.description());
+        category.setImageUrl(request.imageUrl());
+    }
+}
