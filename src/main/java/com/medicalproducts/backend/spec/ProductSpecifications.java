@@ -8,6 +8,8 @@ import org.springframework.data.jpa.domain.Specification;
  */
 public final class ProductSpecifications {
 
+    private static final int MAX_QUERY_LENGTH = 100;
+
     private ProductSpecifications() {
     }
 
@@ -24,11 +26,19 @@ public final class ProductSpecifications {
     }
 
     public static Specification<Product> matchesQuery(String text) {
-        String like = "%" + text.toLowerCase().trim() + "%";
+        String trimmed = text.trim();
+        if (trimmed.length() > MAX_QUERY_LENGTH) {
+            trimmed = trimmed.substring(0, MAX_QUERY_LENGTH);
+        }
+        String escaped = trimmed.toLowerCase()
+                .replace("\\", "\\\\")
+                .replace("%", "\\%")
+                .replace("_", "\\_");
+        String like = "%" + escaped + "%";
         return (root, query, cb) -> cb.or(
-                cb.like(cb.lower(root.get("title")), like),
-                cb.like(cb.lower(root.get("article")), like),
-                cb.like(cb.lower(root.get("shortDescription")), like)
+                cb.like(cb.lower(root.get("title")), like, '\\'),
+                cb.like(cb.lower(root.get("article")), like, '\\'),
+                cb.like(cb.lower(root.get("shortDescription")), like, '\\')
         );
     }
 }

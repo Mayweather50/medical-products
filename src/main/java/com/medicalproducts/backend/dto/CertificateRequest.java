@@ -10,6 +10,7 @@ public record CertificateRequest(
         String description,
 
         @NotBlank(message = "fileUrl is required")
+        @org.hibernate.validator.constraints.URL(message = "fileUrl must be a valid URL")
         String fileUrl
 ) {
 }

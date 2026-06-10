@@ -36,6 +36,7 @@ public record ProductRequest(
         @NotNull(message = "categoryId is required")
         Long categoryId,
 
+        @Size(max = 50, message = "characteristics must have at most 50 entries")
         Map<String, String> characteristics,
 
         Boolean available,
