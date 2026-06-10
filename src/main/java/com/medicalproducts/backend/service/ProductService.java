@@ -10,6 +10,7 @@ import com.medicalproducts.backend.mapper.ProductMapper;
 import com.medicalproducts.backend.repository.ProductRepository;
 import com.medicalproducts.backend.spec.ProductSpecifications;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductService {
@@ -47,7 +49,6 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public PageResponse<ProductResponse> getByCategorySlug(String categorySlug, int page, int size) {
-        // 404, если категории нет — иначе пустая страница вводила бы в заблуждение
         categoryService.findBySlug(categorySlug);
         return getAll(categorySlug, null, null, null, page, size);
     }
@@ -86,6 +87,7 @@ public class ProductService {
         }
         Category category = categoryService.findById(request.categoryId());
         Product product = productRepository.save(productMapper.toEntity(request, category));
+        log.info("Product created: id={}, title='{}', slug='{}'", product.getId(), product.getTitle(), product.getSlug());
         return productMapper.toResponse(product);
     }
 
@@ -97,12 +99,15 @@ public class ProductService {
         }
         Category category = categoryService.findById(request.categoryId());
         productMapper.updateEntity(product, request, category);
+        log.info("Product updated: id={}, title='{}'", id, request.title());
         return productMapper.toResponse(product);
     }
 
     @Transactional
     public void delete(Long id) {
-        productRepository.delete(findById(id));
+        Product product = findById(id);
+        product.markDeleted();
+        log.info("Product soft-deleted: id={}, title='{}'", id, product.getTitle());
     }
 
     private Product findById(Long id) {

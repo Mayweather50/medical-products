@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
@@ -26,6 +27,7 @@ import java.util.Map;
         @Index(name = "idx_products_popular", columnList = "popular"),
         @Index(name = "idx_products_available", columnList = "available")
 })
+@SQLRestriction("deleted_at IS NULL")
 public class Product extends BaseEntity {
 
     @Column(nullable = false)
@@ -55,9 +57,6 @@ public class Product extends BaseEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    /**
-     * Произвольные характеристики товара, хранятся как jsonb в PostgreSQL.
-     */
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private Map<String, String> characteristics = new LinkedHashMap<>();

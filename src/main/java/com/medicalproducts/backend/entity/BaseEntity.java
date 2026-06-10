@@ -13,7 +13,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.Instant;
 
 /**
- * Общие поля всех сущностей: id и аудит-таймстампы.
+ * Общие поля всех сущностей: id, аудит-таймстампы и soft delete.
  */
 @Getter
 @Setter
@@ -31,4 +31,15 @@ public abstract class BaseEntity {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
+
+    public boolean isDeleted() {
+        return deletedAt != null;
+    }
+
+    public void markDeleted() {
+        this.deletedAt = Instant.now();
+    }
 }

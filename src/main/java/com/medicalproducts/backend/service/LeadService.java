@@ -9,6 +9,7 @@ import com.medicalproducts.backend.exception.ResourceNotFoundException;
 import com.medicalproducts.backend.mapper.LeadMapper;
 import com.medicalproducts.backend.repository.LeadRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LeadService {
@@ -28,6 +30,7 @@ public class LeadService {
     @Transactional
     public LeadResponse create(LeadRequest request) {
         Lead lead = leadRepository.save(leadMapper.toEntity(request));
+        log.info("Lead created: id={}, name='{}', phone='{}'", lead.getId(), lead.getName(), lead.getPhone());
         return leadMapper.toResponse(lead);
     }
 
@@ -48,7 +51,9 @@ public class LeadService {
     @Transactional
     public LeadResponse updateStatus(Long id, LeadStatus status) {
         Lead lead = findById(id);
+        LeadStatus oldStatus = lead.getStatus();
         lead.setStatus(status);
+        log.info("Lead status updated: id={}, {} -> {}", id, oldStatus, status);
         return leadMapper.toResponse(lead);
     }
 

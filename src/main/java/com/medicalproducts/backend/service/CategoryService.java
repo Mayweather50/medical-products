@@ -8,12 +8,14 @@ import com.medicalproducts.backend.mapper.CategoryMapper;
 import com.medicalproducts.backend.repository.CategoryRepository;
 import com.medicalproducts.backend.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CategoryService {
@@ -45,6 +47,7 @@ public class CategoryService {
             throw new IllegalArgumentException("Category with slug '" + request.slug() + "' already exists");
         }
         Category category = categoryRepository.save(categoryMapper.toEntity(request));
+        log.info("Category created: id={}, title='{}', slug='{}'", category.getId(), category.getTitle(), category.getSlug());
         return categoryMapper.toResponse(category);
     }
 
@@ -55,6 +58,7 @@ public class CategoryService {
             throw new IllegalArgumentException("Category with slug '" + request.slug() + "' already exists");
         }
         categoryMapper.updateEntity(category, request);
+        log.info("Category updated: id={}, title='{}'", id, request.title());
         return categoryMapper.toResponse(category);
     }
 
@@ -65,7 +69,8 @@ public class CategoryService {
             throw new IllegalArgumentException(
                     "Cannot delete category '" + category.getTitle() + "': it still contains products");
         }
-        categoryRepository.delete(category);
+        category.markDeleted();
+        log.info("Category soft-deleted: id={}, title='{}'", id, category.getTitle());
     }
 
     Category findById(Long id) {
