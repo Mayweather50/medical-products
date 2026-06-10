@@ -1,12 +1,16 @@
 package com.medicalproducts.backend.controller.admin;
 
+import com.medicalproducts.backend.dto.ImportResult;
 import com.medicalproducts.backend.dto.ProductRequest;
 import com.medicalproducts.backend.dto.ProductResponse;
+import com.medicalproducts.backend.service.ExcelImportService;
 import com.medicalproducts.backend.service.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,7 +18,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "Admin: Products", description = "Управление товарами")
 @RestController
@@ -23,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminProductController {
 
     private final ProductService productService;
+    private final ExcelImportService excelImportService;
 
     @PostMapping
     public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest request) {
@@ -38,5 +45,20 @@ public class AdminProductController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         productService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Импорт товаров из Excel",
+            description = "Загрузите .xlsx файл со столбцами: title, slug, article, shortDescription, "
+                    + "description, price, priceOnRequest, imageUrl, categorySlug, available, popular")
+    @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ImportResult> importFromExcel(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("File is empty");
+        }
+        String filename = file.getOriginalFilename();
+        if (filename == null || !(filename.endsWith(".xlsx") || filename.endsWith(".xls"))) {
+            throw new IllegalArgumentException("Only .xlsx and .xls files are supported");
+        }
+        return ResponseEntity.ok(excelImportService.importProducts(file));
     }
 }
