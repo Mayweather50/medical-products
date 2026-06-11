@@ -32,5 +32,14 @@ services:
       - "8080:8080"
     restart: unless-stopped
 
+  frontend:
+    build: ./frontend
+    container_name: medical-products-frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+
 volumes:
   postgres_data:

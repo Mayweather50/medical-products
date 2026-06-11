@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,17 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     boolean existsBySlugAndIdNot(String slug, Long id);
 
     boolean existsByCategoryId(Long categoryId);
+
+    long countByCategoryId(Long categoryId);
+
+    /** Кол-во товаров в каждой категории одним запросом (для списка категорий). */
+    @Query("select p.category.id as categoryId, count(p) as productCount from Product p group by p.category.id")
+    List<CategoryProductCount> countGroupedByCategory();
+
+    interface CategoryProductCount {
+        Long getCategoryId();
+        long getProductCount();
+    }
 
     @EntityGraph(attributePaths = "category")
     List<Product> findTop12ByPopularTrueAndAvailableTrueOrderByCreatedAtDesc();

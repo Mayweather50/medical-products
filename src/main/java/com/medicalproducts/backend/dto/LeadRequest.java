@@ -16,8 +16,8 @@ public record LeadRequest(
                 message = "phone must start with a digit (optionally +) and contain 5-30 characters")
         String phone,
 
-        @NotBlank(message = "email is required")
         @Email(message = "email must be a valid email address")
+        @Size(max = 255)
         String email,
 
         @Size(max = 2000, message = "comment must be at most 2000 characters")

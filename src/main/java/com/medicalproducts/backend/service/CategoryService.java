@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -26,19 +28,23 @@ public class CategoryService {
 
     @Transactional(readOnly = true)
     public List<CategoryResponse> getAll() {
+        Map<Long, Long> counts = productRepository.countGroupedByCategory().stream()
+                .collect(Collectors.toMap(
+                        ProductRepository.CategoryProductCount::getCategoryId,
+                        ProductRepository.CategoryProductCount::getProductCount));
         return categoryRepository.findAll(Sort.by(Sort.Direction.ASC, "title")).stream()
-                .map(categoryMapper::toResponse)
+                .map(category -> categoryMapper.toResponse(category, counts.getOrDefault(category.getId(), 0L)))
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public CategoryResponse getById(Long id) {
-        return categoryMapper.toResponse(findById(id));
+        return toResponseWithCount(findById(id));
     }
 
     @Transactional(readOnly = true)
     public CategoryResponse getBySlug(String slug) {
-        return categoryMapper.toResponse(findBySlug(slug));
+        return toResponseWithCount(findBySlug(slug));
     }
 
     @Transactional
@@ -48,7 +54,7 @@ public class CategoryService {
         }
         Category category = categoryRepository.save(categoryMapper.toEntity(request));
         log.info("Category created: id={}, title='{}', slug='{}'", category.getId(), category.getTitle(), category.getSlug());
-        return categoryMapper.toResponse(category);
+        return categoryMapper.toResponse(category, 0L);
     }
 
     @Transactional
@@ -59,7 +65,7 @@ public class CategoryService {
         }
         categoryMapper.updateEntity(category, request);
         log.info("Category updated: id={}, title='{}'", id, request.title());
-        return categoryMapper.toResponse(category);
+        return toResponseWithCount(category);
     }
 
     @Transactional
@@ -71,6 +77,10 @@ public class CategoryService {
         }
         category.markDeleted();
         log.info("Category soft-deleted: id={}, title='{}'", id, category.getTitle());
+    }
+
+    private CategoryResponse toResponseWithCount(Category category) {
+        return categoryMapper.toResponse(category, productRepository.countByCategoryId(category.getId()));
     }
 
     Category findById(Long id) {

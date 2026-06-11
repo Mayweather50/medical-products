@@ -1,6 +1,10 @@
 target/
 .env
 
+# Frontend
+node_modules/
+frontend/dist/
+
 # IDE
 .idea/
 *.iml

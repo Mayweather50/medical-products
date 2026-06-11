@@ -19,13 +19,14 @@ public class CategoryMapper {
         applyRequest(category, request);
     }
 
-    public CategoryResponse toResponse(Category category) {
+    public CategoryResponse toResponse(Category category, long productCount) {
         return new CategoryResponse(
                 category.getId(),
                 category.getTitle(),
                 category.getSlug(),
                 category.getDescription(),
                 category.getImageUrl(),
+                productCount,
                 category.getCreatedAt(),
                 category.getUpdatedAt()
         );

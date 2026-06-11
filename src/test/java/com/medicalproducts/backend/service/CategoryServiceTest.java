@@ -48,13 +48,14 @@ class CategoryServiceTest {
         category.setUpdatedAt(Instant.now());
 
         categoryResponse = new CategoryResponse(1L, "Test Category", "test-category",
-                null, null, Instant.now(), Instant.now());
+                null, null, 0L, Instant.now(), Instant.now());
     }
 
     @Test
     void getById_existing_returnsResponse() {
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
-        when(categoryMapper.toResponse(category)).thenReturn(categoryResponse);
+        when(productRepository.countByCategoryId(1L)).thenReturn(0L);
+        when(categoryMapper.toResponse(category, 0L)).thenReturn(categoryResponse);
 
         CategoryResponse result = categoryService.getById(1L);
 

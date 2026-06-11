@@ -1,8 +1,10 @@
 package com.medicalproducts.backend.init;
 
 import com.medicalproducts.backend.entity.Category;
+import com.medicalproducts.backend.entity.Certificate;
 import com.medicalproducts.backend.entity.Product;
 import com.medicalproducts.backend.repository.CategoryRepository;
+import com.medicalproducts.backend.repository.CertificateRepository;
 import com.medicalproducts.backend.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ public class DataInitializer implements CommandLineRunner {
 
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
+    private final CertificateRepository certificateRepository;
 
     @Override
     @Transactional
@@ -105,8 +108,31 @@ public class DataInitializer implements CommandLineRunner {
                         chars("Тип", "Механическая", "Ширина сиденья", "45 см", "Вес", "19 кг"))
         ));
 
-        log.info("Seed data created: {} categories, {} products",
-                categoryRepository.count(), productRepository.count());
+        certificateRepository.saveAll(java.util.List.of(
+                certificate("Регистрационное удостоверение Росздравнадзора",
+                        "Подтверждает регистрацию медицинских изделий в РФ. РЗН 2024/12345",
+                        "/docs/rzn-2024-12345.pdf"),
+                certificate("Декларация соответствия ТР ТС",
+                        "Соответствие техническим регламентам Таможенного союза. ЕАЭС N RU Д-CN.РА01.В.01234",
+                        "/docs/eaes-ru-d-cn-ra01.pdf"),
+                certificate("Сертификат ISO 13485",
+                        "Система менеджмента качества медицинских изделий. ISO 13485:2016",
+                        "/docs/iso-13485-2016.pdf"),
+                certificate("Сертификат соответствия ГОСТ Р",
+                        "Добровольная сертификация продукции по ГОСТ Р. РОСС RU.0001.11АБ12",
+                        "/docs/gost-r-ross-ru.pdf")
+        ));
+
+        log.info("Seed data created: {} categories, {} products, {} certificates",
+                categoryRepository.count(), productRepository.count(), certificateRepository.count());
+    }
+
+    private Certificate certificate(String title, String description, String fileUrl) {
+        Certificate certificate = new Certificate();
+        certificate.setTitle(title);
+        certificate.setDescription(description);
+        certificate.setFileUrl(fileUrl);
+        return certificate;
     }
 
     private Category category(String title, String slug, String description) {
