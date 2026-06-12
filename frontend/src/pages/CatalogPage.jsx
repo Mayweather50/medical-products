@@ -25,6 +25,13 @@ export default function CatalogPage() {
   const [onlyAvail, setOnlyAvail] = useState(false);
   const [sort, setSort] = useState("default");
   const [view, setView] = useState("grid");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  /* Пока открыта панель фильтров — страница под ней не прокручивается */
+  useEffect(() => {
+    document.body.style.overflow = filtersOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [filtersOpen]);
 
   const [searchInput, setSearchInput] = useState(query);
   useEffect(() => setSearchInput(query), [query]);
@@ -103,6 +110,7 @@ export default function CatalogPage() {
 
   const activeCat = categories.find((c) => c.slug === cat);
   const hasFilters = cat || onlyAvail || onlyPopular || query;
+  const filterCount = (cat ? 1 : 0) + (onlyAvail ? 1 : 0) + (onlyPopular ? 1 : 0);
   const reset = () => {
     setOnlyAvail(false);
     setSearchInput("");
@@ -131,7 +139,10 @@ export default function CatalogPage() {
       </div>
 
       <div className="wrap catalog-layout">
-        <aside className="filters">
+        {filtersOpen && (
+          <div className="filters-backdrop" onClick={() => setFiltersOpen(false)} />
+        )}
+        <aside className={"filters" + (filtersOpen ? " is-open" : "")}>
           <div className="filters__head">
             <span>
               <Icon name="filter" size={18} /> Фильтры
@@ -141,6 +152,13 @@ export default function CatalogPage() {
                 Сбросить
               </button>
             )}
+            <button
+              className="filters__close"
+              onClick={() => setFiltersOpen(false)}
+              aria-label="Закрыть фильтры"
+            >
+              <Icon name="close" size={20} />
+            </button>
           </div>
 
           <div className="filter-group">
@@ -207,10 +225,20 @@ export default function CatalogPage() {
               Оставить заявку
             </Button>
           </div>
+
+          <div className="filters__apply">
+            <Button variant="primary" size="md" onClick={() => setFiltersOpen(false)}>
+              Показать {state.total} {plural(state.total, ["товар", "товара", "товаров"])}
+            </Button>
+          </div>
         </aside>
 
         <div className="catalog-main">
           <div className="catalog-bar">
+            <button className="filters-toggle" onClick={() => setFiltersOpen(true)}>
+              <Icon name="filter" size={17} /> Фильтры
+              {filterCount > 0 && <span className="filters-toggle__n">{filterCount}</span>}
+            </button>
             <div className="catalog-search">
               <Icon name="search" size={18} className="catalog-search__ic" />
               <input
