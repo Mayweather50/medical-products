@@ -3,12 +3,17 @@ package com.medicalproducts.backend.init;
 import com.medicalproducts.backend.entity.Category;
 import com.medicalproducts.backend.entity.Certificate;
 import com.medicalproducts.backend.entity.Product;
+import com.medicalproducts.backend.entity.Role;
+import com.medicalproducts.backend.entity.User;
 import com.medicalproducts.backend.repository.CategoryRepository;
 import com.medicalproducts.backend.repository.CertificateRepository;
 import com.medicalproducts.backend.repository.ProductRepository;
+import com.medicalproducts.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,10 +32,19 @@ public class DataInitializer implements CommandLineRunner {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
     private final CertificateRepository certificateRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Value("${app.admin.username:admin}")
+    private String adminUsername;
+
+    @Value("${app.admin.password:admin12345}")
+    private String adminPassword;
 
     @Override
     @Transactional
     public void run(String... args) {
+        seedAdminUser();
         if (categoryRepository.count() > 0) {
             log.info("Database already initialized, skipping seed data");
             return;
@@ -125,6 +139,20 @@ public class DataInitializer implements CommandLineRunner {
 
         log.info("Seed data created: {} categories, {} products, {} certificates",
                 categoryRepository.count(), productRepository.count(), certificateRepository.count());
+    }
+
+    /** Создаёт администратора при первом запуске (логин/пароль задаются через app.admin.*). */
+    private void seedAdminUser() {
+        if (userRepository.count() > 0) {
+            return;
+        }
+        User admin = new User();
+        admin.setUsername(adminUsername);
+        admin.setPassword(passwordEncoder.encode(adminPassword));
+        admin.setRole(Role.ROLE_ADMIN);
+        userRepository.save(admin);
+        log.warn("Created default admin user '{}'. Change the password in production (app.admin.password)!",
+                adminUsername);
     }
 
     private Certificate certificate(String title, String description, String fileUrl) {

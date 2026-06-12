@@ -48,6 +48,8 @@ const PATHS = {
   cart: ["circle:9 20 1.4", "circle:17 20 1.4", "path:M3 4h2l2.2 11h10l2-7H6.2"],
   pulse: ["path:M3 12h4l2-5 4 12 2.5-7H21"],
   menu: ["path:M4 7h16", "path:M4 12h16", "path:M4 17h16"],
+  user: ["circle:12 8 3.5", "path:M5 20a7 7 0 0114 0"],
+  logout: ["path:M14 4h-7v16h7", "path:M10 12h10", "path:M17 9l3 3-3 3"],
 };
 
 const CAT_PATHS = {

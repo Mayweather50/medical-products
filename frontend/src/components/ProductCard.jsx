@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Badge from "./Badge";
 import ProductImage from "./ProductImage";
@@ -5,11 +6,23 @@ import { Icon } from "./Icon";
 import { fmtPrice } from "../lib/format";
 import { catMeta } from "../lib/categoryMeta";
 import { useLeadModal } from "../context/LeadModalContext";
+import { useCart } from "../context/CartContext";
 
 export default function ProductCard({ product: p }) {
   const navigate = useNavigate();
   const openLead = useLeadModal();
+  const cart = useCart();
+  const [added, setAdded] = useState(false);
+  const addedTimer = useRef(null);
   const open = () => navigate(`/product/${p.slug}`);
+
+  const addToCart = (e) => {
+    e.stopPropagation();
+    cart.add(p);
+    setAdded(true);
+    clearTimeout(addedTimer.current);
+    addedTimer.current = setTimeout(() => setAdded(false), 1200);
+  };
 
   return (
     <article
@@ -47,16 +60,26 @@ export default function ProductCard({ product: p }) {
             </>
           )}
         </div>
-        <button
-          className="card__cta"
-          aria-label="Запросить"
-          onClick={(e) => {
-            e.stopPropagation();
-            openLead(p);
-          }}
-        >
-          <Icon name={p.priceOnRequest ? "headset" : "arrowSm"} size={19} />
-        </button>
+        {p.priceOnRequest ? (
+          <button
+            className="card__cta"
+            aria-label="Запросить цену"
+            onClick={(e) => {
+              e.stopPropagation();
+              openLead(p);
+            }}
+          >
+            <Icon name="headset" size={19} />
+          </button>
+        ) : (
+          <button
+            className={"card__cta" + (added ? " is-added" : "")}
+            aria-label="В корзину"
+            onClick={addToCart}
+          >
+            <Icon name={added ? "check" : "cart"} size={19} />
+          </button>
+        )}
       </div>
     </article>
   );

@@ -2,12 +2,32 @@
    В dev запросы идут через прокси Vite, в prod — через nginx. */
 
 const API_BASE = import.meta.env.VITE_API_URL || "";
+const AUTH_KEY = "medcor_auth";
+
+export function getStoredAuth() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(AUTH_KEY));
+    return raw?.token ? raw : null;
+  } catch {
+    return null;
+  }
+}
+
+export function storeAuth(auth) {
+  if (auth) localStorage.setItem(AUTH_KEY, JSON.stringify(auth));
+  else localStorage.removeItem(AUTH_KEY);
+}
 
 async function request(path, options = {}) {
-  const res = await fetch(API_BASE + path, {
-    headers: { "Content-Type": "application/json", ...options.headers },
-    ...options,
-  });
+  const headers = { ...options.headers };
+  // Для FormData Content-Type выставляет браузер (с boundary)
+  if (!(options.body instanceof FormData)) {
+    headers["Content-Type"] = headers["Content-Type"] || "application/json";
+  }
+  const auth = getStoredAuth();
+  if (auth) headers["Authorization"] = `Bearer ${auth.token}`;
+
+  const res = await fetch(API_BASE + path, { ...options, headers });
   if (!res.ok) {
     let body = null;
     try {
@@ -47,4 +67,45 @@ export const api = {
   /** POST /api/leads: { name, phone, email?, comment?, productName? } */
   createLead: (payload) =>
     request("/api/leads", { method: "POST", body: JSON.stringify(payload) }),
+
+  /** POST /api/orders: { name, phone, comment?, items: [{ productId, quantity }] } */
+  createOrder: (payload) =>
+    request("/api/orders", { method: "POST", body: JSON.stringify(payload) }),
+
+  /* ---- Аутентификация ---- */
+  login: (payload) =>
+    request("/api/auth/login", { method: "POST", body: JSON.stringify(payload) }),
+  register: (payload) =>
+    request("/api/auth/register", { method: "POST", body: JSON.stringify(payload) }),
+
+  /* ---- Админ (требуют JWT с ролью ADMIN) ---- */
+  admin: {
+    getLeads: (params = {}) => request(`/api/admin/leads${qs(params)}`),
+    updateLeadStatus: (id, status) =>
+      request(`/api/admin/leads/${id}/status`, {
+        method: "PUT",
+        body: JSON.stringify({ status }),
+      }),
+
+    getOrders: (params = {}) => request(`/api/admin/orders${qs(params)}`),
+    updateOrderStatus: (id, status) =>
+      request(`/api/admin/orders/${id}/status${qs({ status })}`, { method: "PATCH" }),
+
+    createProduct: (payload) =>
+      request("/api/admin/products", { method: "POST", body: JSON.stringify(payload) }),
+    updateProduct: (id, payload) =>
+      request(`/api/admin/products/${id}`, { method: "PUT", body: JSON.stringify(payload) }),
+    deleteProduct: (id) => request(`/api/admin/products/${id}`, { method: "DELETE" }),
+    importProducts: (file) => {
+      const fd = new FormData();
+      fd.append("file", file);
+      return request("/api/admin/products/import", { method: "POST", body: fd });
+    },
+
+    createCategory: (payload) =>
+      request("/api/admin/categories", { method: "POST", body: JSON.stringify(payload) }),
+    updateCategory: (id, payload) =>
+      request(`/api/admin/categories/${id}`, { method: "PUT", body: JSON.stringify(payload) }),
+    deleteCategory: (id) => request(`/api/admin/categories/${id}`, { method: "DELETE" }),
+  },
 };

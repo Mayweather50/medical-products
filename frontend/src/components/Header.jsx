@@ -5,6 +5,8 @@ import { Icon, CatIcon } from "./Icon";
 import { catalogUrl, plural } from "../lib/format";
 import { useCatalog } from "../context/CatalogContext";
 import { useLeadModal } from "../context/LeadModalContext";
+import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 const BRAND = "Медкор";
 
@@ -12,6 +14,8 @@ export default function Header() {
   const navigate = useNavigate();
   const { categories } = useCatalog();
   const openLead = useLeadModal();
+  const cart = useCart();
+  const { user, isAdmin, logout } = useAuth();
   const [search, setSearch] = useState("");
   const [catOpen, setCatOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -102,6 +106,24 @@ export default function Header() {
             <Button variant="primary" size="md" icon="doc" onClick={() => openLead()}>
               Оставить заявку
             </Button>
+            <Link
+              className="head-icobtn"
+              to={user ? (isAdmin ? "/admin" : "/") : "/login"}
+              onClick={(e) => {
+                setMenuOpen(false);
+                // обычный пользователь: повторный клик — выход
+                if (user && !isAdmin) { e.preventDefault(); logout(); }
+              }}
+              aria-label={user ? (isAdmin ? "Админ-панель" : "Выйти") : "Войти"}
+              title={user ? (isAdmin ? `Админ-панель (${user.username})` : `Выйти (${user.username})`) : "Войти"}
+            >
+              <Icon name={user && !isAdmin ? "logout" : "user"} size={21} />
+              {user && <span className="head-icobtn__dot" />}
+            </Link>
+            <Link className="head-icobtn" to="/cart" aria-label="Корзина" onClick={() => setMenuOpen(false)}>
+              <Icon name="cart" size={21} />
+              {cart.count > 0 && <span className="head-icobtn__n">{cart.count}</span>}
+            </Link>
             <button
               className="head-burger"
               aria-label={menuOpen ? "Закрыть меню" : "Открыть меню"}
@@ -194,10 +216,14 @@ export default function Header() {
           </nav>
 
           <nav className="mobile-menu__links">
+            <Link to="/cart" onClick={() => setMenuOpen(false)}>
+              Корзина{cart.count > 0 ? ` (${cart.count})` : ""}
+            </Link>
             <Link to={catalogUrl({ popular: true })} onClick={() => setMenuOpen(false)}>Популярное</Link>
             <Link to="/#advantages" onClick={() => setMenuOpen(false)}>Почему мы</Link>
             <Link to="/#certificates" onClick={() => setMenuOpen(false)}>Сертификаты</Link>
             <Link to="/#contacts" onClick={() => setMenuOpen(false)}>Контакты</Link>
+            {isAdmin && <Link to="/admin" onClick={() => setMenuOpen(false)}>Админ-панель</Link>}
           </nav>
 
           <div className="mobile-menu__foot">

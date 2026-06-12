@@ -10,6 +10,7 @@ import { api } from "../api";
 import { plural } from "../lib/format";
 import { useCatalog } from "../context/CatalogContext";
 import { useLeadModal } from "../context/LeadModalContext";
+import { usePageTitle } from "../lib/usePageTitle";
 
 const PAGE_SIZE = 24;
 
@@ -109,6 +110,7 @@ export default function CatalogPage() {
   }, [state.items, sort]);
 
   const activeCat = categories.find((c) => c.slug === cat);
+  usePageTitle(activeCat ? activeCat.title : onlyPopular ? "Популярные товары" : "Каталог товаров");
   const hasFilters = cat || onlyAvail || onlyPopular || query;
   const filterCount = (cat ? 1 : 0) + (onlyAvail ? 1 : 0) + (onlyPopular ? 1 : 0);
   const reset = () => {

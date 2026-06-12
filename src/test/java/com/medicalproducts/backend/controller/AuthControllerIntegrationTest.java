@@ -64,7 +64,7 @@ class AuthControllerIntegrationTest {
         savedUser.setId(1L);
         savedUser.setUsername("testuser");
         savedUser.setPassword("encoded");
-        savedUser.setRole(Role.ROLE_ADMIN);
+        savedUser.setRole(Role.ROLE_USER);
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
         mockMvc.perform(post("/api/auth/register")
@@ -73,7 +73,7 @@ class AuthControllerIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.token").isNotEmpty())
                 .andExpect(jsonPath("$.username").value("testuser"))
-                .andExpect(jsonPath("$.role").value("ROLE_ADMIN"));
+                .andExpect(jsonPath("$.role").value("ROLE_USER"));
     }
 
     @Test

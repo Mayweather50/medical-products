@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Badge from "../components/Badge";
 import Breadcrumbs from "../components/Breadcrumbs";
@@ -11,14 +11,23 @@ import { api } from "../api";
 import { catalogUrl, fmtPrice } from "../lib/format";
 import { catMeta } from "../lib/categoryMeta";
 import { useLeadModal } from "../context/LeadModalContext";
+import { useCart } from "../context/CartContext";
+import { usePageTitle } from "../lib/usePageTitle";
 
 export default function ProductPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const openLead = useLeadModal();
+  const cart = useCart();
 
   const [state, setState] = useState({ product: null, loading: true, error: null });
   const [related, setRelated] = useState([]);
+  const [qty, setQty] = useState(1);
+  const [added, setAdded] = useState(false);
+  const addedTimer = useRef(null);
+
+  useEffect(() => { setQty(1); }, [slug]);
+  usePageTitle(state.product?.title);
 
   const load = () => {
     setState({ product: null, loading: true, error: null });
@@ -119,14 +128,36 @@ export default function ProductPage() {
               )}
             </div>
             <div className="buybox__actions">
-              <Button
-                variant="primary"
-                size="lg"
-                icon={p.priceOnRequest ? "headset" : "doc"}
-                onClick={() => openLead(p)}
-              >
-                {p.priceOnRequest ? "Запросить цену" : "Оставить заявку"}
-              </Button>
+              {p.priceOnRequest ? (
+                <Button variant="primary" size="lg" icon="headset" onClick={() => openLead(p)}>
+                  Запросить цену
+                </Button>
+              ) : (
+                <>
+                  <div className="qty qty--lg">
+                    <button onClick={() => setQty(Math.max(1, qty - 1))} aria-label="Меньше">
+                      <Icon name="minus" size={16} />
+                    </button>
+                    <span>{qty}</span>
+                    <button onClick={() => setQty(qty + 1)} aria-label="Больше">
+                      <Icon name="plus" size={16} />
+                    </button>
+                  </div>
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    icon={added ? "check" : "cart"}
+                    onClick={() => {
+                      cart.add(p, qty);
+                      setAdded(true);
+                      clearTimeout(addedTimer.current);
+                      addedTimer.current = setTimeout(() => setAdded(false), 1200);
+                    }}
+                  >
+                    {added ? "Добавлено" : "В корзину"}
+                  </Button>
+                </>
+              )}
               <Button variant="outline" size="lg" icon="phone" onClick={() => openLead(p)}>
                 Заказать звонок
               </Button>

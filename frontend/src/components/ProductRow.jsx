@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Badge from "./Badge";
 import Button from "./Button";
@@ -5,10 +6,14 @@ import ProductImage from "./ProductImage";
 import { fmtPrice } from "../lib/format";
 import { catMeta } from "../lib/categoryMeta";
 import { useLeadModal } from "../context/LeadModalContext";
+import { useCart } from "../context/CartContext";
 
 export default function ProductRow({ product: p }) {
   const navigate = useNavigate();
   const openLead = useLeadModal();
+  const cart = useCart();
+  const [added, setAdded] = useState(false);
+  const addedTimer = useRef(null);
 
   return (
     <article className="prow" onClick={() => navigate(`/product/${p.slug}`)}>
@@ -37,13 +42,20 @@ export default function ProductRow({ product: p }) {
         <Button
           variant="primary"
           size="sm"
-          icon={p.priceOnRequest ? "headset" : "doc"}
+          icon={p.priceOnRequest ? "headset" : added ? "check" : "cart"}
           onClick={(e) => {
             e.stopPropagation();
-            openLead(p);
+            if (p.priceOnRequest) {
+              openLead(p);
+            } else {
+              cart.add(p);
+              setAdded(true);
+              clearTimeout(addedTimer.current);
+              addedTimer.current = setTimeout(() => setAdded(false), 1200);
+            }
           }}
         >
-          {p.priceOnRequest ? "Запросить" : "Заявка"}
+          {p.priceOnRequest ? "Запросить" : added ? "Добавлено" : "В корзину"}
         </Button>
       </div>
     </article>
