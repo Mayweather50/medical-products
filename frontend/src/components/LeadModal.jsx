@@ -9,6 +9,18 @@ import { api } from "../api";
 
 const EMPTY_FORM = { name: "", phone: "", email: "", comment: "" };
 
+function formatPhone(value) {
+  const digits = value.replace(/\D/g, "");
+  const d = digits.startsWith("8") ? "7" + digits.slice(1) : digits;
+  let result = "";
+  if (d.length > 0) result = "+" + d.slice(0, 1);
+  if (d.length > 1) result += " (" + d.slice(1, 4);
+  if (d.length > 4) result += ") " + d.slice(4, 7);
+  if (d.length > 7) result += "-" + d.slice(7, 9);
+  if (d.length > 9) result += "-" + d.slice(9, 11);
+  return result;
+}
+
 export default function LeadModal({ open, onClose, product }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
@@ -151,7 +163,7 @@ export default function LeadModal({ open, onClose, product }) {
                 <input
                   type="tel"
                   value={form.phone}
-                  onChange={set("phone")}
+                  onChange={(e) => setForm((f) => ({ ...f, phone: formatPhone(e.target.value) }))}
                   placeholder="+7 (900) 123-45-67"
                 />
                 {errors.phone && <span className="field__err">{errors.phone}</span>}

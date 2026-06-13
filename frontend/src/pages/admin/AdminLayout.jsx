@@ -26,6 +26,9 @@ export default function AdminLayout() {
         <NavLink to="/admin/products">
           <Icon name="box" size={17} /> Товары
         </NavLink>
+        <NavLink to="/admin/categories">
+          <Icon name="star" size={17} /> Категории
+        </NavLink>
         <button className="admin__logout" onClick={logout}>
           <Icon name="close" size={15} /> Выйти ({user.username})
         </button>

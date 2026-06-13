@@ -1,6 +1,3 @@
-/* Презентационные атрибуты категорий (иконка, короткое название).
-   Бэкенд хранит только данные; внешний вид — забота фронтенда. */
-
 const META = {
   "rashodnye-materialy": { icon: "consumables", shortTitle: "Расходные материалы" },
   "siz": { icon: "ppe", shortTitle: "СИЗ" },
@@ -12,11 +9,18 @@ const META = {
   "oborudovanie-dlya-klinik": { icon: "clinic", shortTitle: "Для клиник" },
 };
 
-/** Принимает категорию API ({ slug, title, ... }) и возвращает { icon, shortTitle }. */
 export function catMeta(category) {
-  const m = (category && META[category.slug]) || {};
+  if (!category) return { icon: "clinic", shortTitle: "" };
+
+  const m = META[category.slug] || {};
+
+  let icon = m.icon;
+  if (!icon && category.imageUrl && category.imageUrl.startsWith("icon:")) {
+    icon = category.imageUrl.slice(5);
+  }
+
   return {
-    icon: m.icon || "clinic",
-    shortTitle: m.shortTitle || (category ? category.title : ""),
+    icon: icon || "clinic",
+    shortTitle: m.shortTitle || category.title,
   };
 }

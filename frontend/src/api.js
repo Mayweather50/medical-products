@@ -101,6 +101,11 @@ export const api = {
       fd.append("file", file);
       return request("/api/admin/products/import", { method: "POST", body: fd });
     },
+    uploadImage: (file) => {
+      const fd = new FormData();
+      fd.append("file", file);
+      return request("/api/admin/products/upload-image", { method: "POST", body: fd });
+    },
 
     createCategory: (payload) =>
       request("/api/admin/categories", { method: "POST", body: JSON.stringify(payload) }),

@@ -53,6 +53,7 @@ public class SecurityConfig {
                                 "/api/certificates/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/leads", "/api/orders").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html",
                                 "/api-docs/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()

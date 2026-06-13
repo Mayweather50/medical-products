@@ -63,8 +63,10 @@ export default function AdminProducts() {
   const [saving, setSaving] = useState(false);
 
   const fileRef = useRef(null);
+  const imgRef = useRef(null);
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   const load = () => {
     setState((s) => ({ ...s, loading: true, error: null }));
@@ -153,6 +155,19 @@ export default function AdminProducts() {
       reloadCategories?.();
     } catch (err) {
       alert("Не удалось удалить: " + err.message);
+    }
+  };
+
+  const uploadImage = async (file) => {
+    setUploading(true);
+    try {
+      const { url } = await api.admin.uploadImage(file);
+      setEditing((ed) => ({ ...ed, form: { ...ed.form, imageUrl: url } }));
+    } catch (err) {
+      setFormErrors((prev) => ({ ...prev, imageUrl: err.message }));
+    } finally {
+      setUploading(false);
+      if (imgRef.current) imgRef.current.value = "";
     }
   };
 
@@ -349,10 +364,32 @@ export default function AdminProducts() {
                   {err("price")}{err("priceValid")}
                 </label>
 
-                <label className="field">
-                  <span className="field__lbl">URL изображения</span>
-                  <input type="text" value={editing.form.imageUrl} onChange={setF("imageUrl")} />
-                </label>
+                <div className={"field" + (formErrors.imageUrl ? " field--err" : "")}>
+                  <span className="field__lbl">Изображение</span>
+                  <input
+                    ref={imgRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    hidden
+                    onChange={(e) => e.target.files[0] && uploadImage(e.target.files[0])}
+                  />
+                  <div className="admin-form__image-upload">
+                    {editing.form.imageUrl && (
+                      <div className="admin-form__image-preview">
+                        <img src={editing.form.imageUrl} alt="Превью" />
+                        <button type="button" className="admin-form__image-remove"
+                                onClick={() => setEditing((ed) => ({ ...ed, form: { ...ed.form, imageUrl: "" } }))}>
+                          <Icon name="close" size={14} />
+                        </button>
+                      </div>
+                    )}
+                    <Button type="button" variant="outline" size="sm" icon="doc" disabled={uploading}
+                            onClick={() => imgRef.current?.click()}>
+                      {uploading ? "Загружаем…" : editing.form.imageUrl ? "Заменить" : "Загрузить"}
+                    </Button>
+                  </div>
+                  {err("imageUrl")}
+                </div>
               </div>
 
               <div className="admin-form__checks">

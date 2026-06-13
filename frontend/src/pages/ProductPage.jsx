@@ -85,13 +85,6 @@ export default function ProductPage() {
       <div className="wrap product-top">
         <div className="product-gallery">
           <ProductImage product={p} size={120} className="product-gallery__main" />
-          <div className="product-gallery__thumbs">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className={"product-gallery__thumb" + (i === 0 ? " is-active" : "")}>
-                <ProductImage product={p} size={30} />
-              </div>
-            ))}
-          </div>
         </div>
 
         <div className="product-info">

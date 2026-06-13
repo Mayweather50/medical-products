@@ -4,6 +4,7 @@ import com.medicalproducts.backend.dto.ImportResult;
 import com.medicalproducts.backend.dto.ProductRequest;
 import com.medicalproducts.backend.dto.ProductResponse;
 import com.medicalproducts.backend.service.ExcelImportService;
+import com.medicalproducts.backend.service.ImageStorageService;
 import com.medicalproducts.backend.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
 @Tag(name = "Admin: Products", description = "Управление товарами")
 @RestController
 @RequestMapping("/api/admin/products")
@@ -30,6 +33,7 @@ public class AdminProductController {
 
     private final ProductService productService;
     private final ExcelImportService excelImportService;
+    private final ImageStorageService imageStorageService;
 
     @PostMapping
     public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest request) {
@@ -45,6 +49,13 @@ public class AdminProductController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         productService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Загрузить изображение товара")
+    @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {
+        String url = imageStorageService.store(file);
+        return ResponseEntity.ok(Map.of("url", url));
     }
 
     @Operation(summary = "Импорт товаров из Excel",

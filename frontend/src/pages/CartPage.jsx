@@ -11,6 +11,18 @@ import { usePageTitle } from "../lib/usePageTitle";
 
 const EMPTY_FORM = { name: "", phone: "", comment: "" };
 
+function formatPhone(value) {
+  const digits = value.replace(/\D/g, "");
+  const d = digits.startsWith("8") ? "7" + digits.slice(1) : digits;
+  let result = "";
+  if (d.length > 0) result = "+" + d.slice(0, 1);
+  if (d.length > 1) result += " (" + d.slice(1, 4);
+  if (d.length > 4) result += ") " + d.slice(4, 7);
+  if (d.length > 7) result += "-" + d.slice(7, 9);
+  if (d.length > 9) result += "-" + d.slice(9, 11);
+  return result;
+}
+
 export default function CartPage() {
   usePageTitle("Корзина");
   const navigate = useNavigate();
@@ -166,7 +178,7 @@ export default function CartPage() {
 
               <label className={"field" + (errors.phone ? " field--err" : "")}>
                 <span className="field__lbl">Телефон <i>*</i></span>
-                <input type="tel" value={form.phone} onChange={set("phone")} placeholder="+7 (900) 123-45-67" />
+                <input type="tel" value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: formatPhone(e.target.value) }))} placeholder="+7 (900) 123-45-67" />
                 {errors.phone && <span className="field__err">{errors.phone}</span>}
               </label>
 
