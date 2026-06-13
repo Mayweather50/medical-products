@@ -42,17 +42,19 @@ export default function AdminLeads() {
     <section>
       <div className="admin__head">
         <h2>Заявки {d && <small>({d.totalElements})</small>}</h2>
-        <div className="select">
-          <select
-            value={statusFilter}
-            onChange={(e) => { setStatusFilter(e.target.value); setPage(0); }}
-            aria-label="Фильтр по статусу"
-          >
-            <option value="">Все статусы</option>
-            {STATUS_VALUES.map((s) => (
-              <option key={s} value={s}>{STATUS_LABELS[s]}</option>
-            ))}
-          </select>
+        <div className="status-filter">
+          <button
+            className={"status-filter__tab" + (statusFilter === "" ? " is-active" : "")}
+            onClick={() => { setStatusFilter(""); setPage(0); }}
+          >Все</button>
+          {STATUS_VALUES.map((s) => (
+            <button
+              key={s}
+              className={"status-filter__tab" + (statusFilter === s ? " is-active" : "")}
+              data-status={s}
+              onClick={() => { setStatusFilter(s); setPage(0); }}
+            >{STATUS_LABELS[s]}</button>
+          ))}
         </div>
       </div>
 

@@ -905,6 +905,19 @@ img { max-width: 100%; display: block; }
 .select select[data-status="COMPLETED"] { color: var(--ok); border-color: var(--ok); background: var(--ok-soft); }
 .select select[data-status="CANCELLED"] { color: var(--muted); background: var(--bg); }
 
+.status-filter { display: flex; gap: 6px; flex-wrap: wrap; }
+.status-filter__tab {
+  padding: 6px 14px; border: 1.5px solid var(--line); border-radius: var(--r-pill);
+  background: var(--surface); font-size: 13px; font-weight: 500; font-family: inherit;
+  color: var(--ink-2); cursor: pointer; transition: all 0.14s ease;
+}
+.status-filter__tab:hover { border-color: var(--primary); color: var(--primary-deep); }
+.status-filter__tab.is-active { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; }
+.status-filter__tab[data-status="NEW"].is-active { background: #bf552c; border-color: #bf552c; }
+.status-filter__tab[data-status="IN_PROGRESS"].is-active { background: var(--primary); border-color: var(--primary); }
+.status-filter__tab[data-status="COMPLETED"].is-active { background: #1a7a4f; border-color: #1a7a4f; }
+.status-filter__tab[data-status="CANCELLED"].is-active { background: var(--muted); border-color: var(--muted); }
+
 .status-badge { position: relative; display: inline-block; }
 .status-badge__current {
   display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
