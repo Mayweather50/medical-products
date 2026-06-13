@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Loading, LoadError } from "../../components/StateBlock";
 import Button from "../../components/Button";
+import StatusBadge from "../../components/StatusBadge";
 import { api } from "../../api";
 import { ORDER_STATUS_LABELS, STATUS_VALUES, fmtDate } from "./statuses";
 
@@ -59,17 +60,12 @@ export default function AdminOrders() {
                   <span>
                     {o.customerName}, <a href={`tel:${o.customerPhone}`}>{o.customerPhone}</a>
                   </span>
-                  <div className="select select--sm">
-                    <select
-                      value={o.status}
-                      onChange={(e) => changeStatus(o, e.target.value)}
-                      data-status={o.status}
-                    >
-                      {STATUS_VALUES.map((s) => (
-                        <option key={s} value={s}>{ORDER_STATUS_LABELS[s]}</option>
-                      ))}
-                    </select>
-                  </div>
+                  <StatusBadge
+                    value={o.status}
+                    options={STATUS_VALUES}
+                    labels={ORDER_STATUS_LABELS}
+                    onChange={(s) => changeStatus(o, s)}
+                  />
                 </div>
                 {o.comment && <p className="admin-order__comment">{o.comment}</p>}
                 <ul className="admin-order__items">

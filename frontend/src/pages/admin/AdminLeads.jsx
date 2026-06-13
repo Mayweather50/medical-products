@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Loading, LoadError } from "../../components/StateBlock";
 import Button from "../../components/Button";
+import StatusBadge from "../../components/StatusBadge";
 import { api } from "../../api";
 import { STATUS_LABELS, STATUS_VALUES, fmtDate } from "./statuses";
 
@@ -91,17 +92,12 @@ export default function AdminLeads() {
                       {l.comment}
                     </td>
                     <td>
-                      <div className="select select--sm">
-                        <select
-                          value={l.status}
-                          onChange={(e) => changeStatus(l, e.target.value)}
-                          data-status={l.status}
-                        >
-                          {STATUS_VALUES.map((s) => (
-                            <option key={s} value={s}>{STATUS_LABELS[s]}</option>
-                          ))}
-                        </select>
-                      </div>
+                      <StatusBadge
+                        value={l.status}
+                        options={STATUS_VALUES}
+                        labels={STATUS_LABELS}
+                        onChange={(s) => changeStatus(l, s)}
+                      />
                     </td>
                   </tr>
                 ))}
