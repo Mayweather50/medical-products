@@ -855,6 +855,8 @@ img { max-width: 100%; display: block; }
 .admin__nav a:nth-child(4).active svg { color: #2176ad; }
 .admin__nav a:nth-child(5) svg { color: #9b59b6; }
 .admin__nav a:nth-child(5).active svg { color: #7a3d96; }
+.admin__nav a:nth-child(6) svg { color: #95a5a6; }
+.admin__nav a:nth-child(6).active svg { color: #7f8c8d; }
 .admin__logout {
   display: flex; align-items: center; gap: 9px; padding: 9px 10px; margin-top: 8px;
   border: none; border-top: 1px solid var(--line-2); background: none;

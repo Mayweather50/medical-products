@@ -12,6 +12,7 @@ import AdminLeads from "./pages/admin/AdminLeads";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminCategories from "./pages/admin/AdminCategories";
+import AdminTrash from "./pages/admin/AdminTrash";
 import { CatalogProvider } from "./context/CatalogContext";
 import { LeadModalProvider } from "./context/LeadModalContext";
 import { CartProvider } from "./context/CartContext";
@@ -40,6 +41,7 @@ export default function App() {
                     <Route path="orders" element={<AdminOrders />} />
                     <Route path="products" element={<AdminProducts />} />
                     <Route path="categories" element={<AdminCategories />} />
+                    <Route path="trash" element={<AdminTrash />} />
                   </Route>
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>

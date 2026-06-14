@@ -60,8 +60,6 @@ export default function AdminProducts() {
   const [page, setPage] = useState(0);
   const [query, setQuery] = useState("");
   const [state, setState] = useState({ data: null, loading: true, error: null });
-  const [showTrash, setShowTrash] = useState(false);
-  const [trash, setTrash] = useState([]);
   const [confirmDelete, setConfirmDelete] = useState(null);
 
   const [editing, setEditing] = useState(null); // null | { product|null, form }
@@ -168,36 +166,6 @@ export default function AdminProducts() {
     }
   };
 
-  const loadTrash = async () => {
-    try {
-      const data = await api.admin.getTrash();
-      setTrash(data);
-      setShowTrash(true);
-    } catch (err) {
-      toast.error("Не удалось загрузить корзину: " + err.message);
-    }
-  };
-
-  const restoreProduct = async (p) => {
-    try {
-      await api.admin.restoreProduct(p.id);
-      toast.success(`Товар «${p.title}» восстановлен`);
-      setTrash((prev) => prev.filter((t) => t.id !== p.id));
-      load();
-    } catch (err) {
-      toast.error("Не удалось восстановить: " + err.message);
-    }
-  };
-
-  const deletePermanently = async (p) => {
-    try {
-      await api.admin.deleteProductPermanently(p.id);
-      toast.success(`Товар «${p.title}» удалён навсегда`);
-      setTrash((prev) => prev.filter((t) => t.id !== p.id));
-    } catch (err) {
-      toast.error("Не удалось удалить: " + err.message);
-    }
-  };
 
   const uploadImage = async (file) => {
     setUploading(true);
@@ -246,9 +214,6 @@ export default function AdminProducts() {
           <Button variant="outline" size="sm" icon="doc" disabled={importing}
                   onClick={() => fileRef.current?.click()}>
             {importing ? "Импортируем…" : "Импорт из Excel"}
-          </Button>
-          <Button variant="outline" size="sm" onClick={loadTrash}>
-            Корзина
           </Button>
           <Button variant="primary" size="sm" icon="plus" onClick={openCreate}>
             Добавить товар
@@ -496,45 +461,6 @@ export default function AdminProducts() {
         onCancel={() => setConfirmDelete(null)}
       />
 
-      {showTrash && (
-        <div className="modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setShowTrash(false); }}>
-          <div className="modal modal--wide" role="dialog" aria-modal="true">
-            <button className="modal__close" onClick={() => setShowTrash(false)} aria-label="Закрыть">
-              <Icon name="close" size={20} />
-            </button>
-            <div className="modal__head">
-              <h3>Корзина {trash.length > 0 && <small>({trash.length})</small>}</h3>
-            </div>
-            {trash.length === 0 ? (
-              <p style={{ color: "var(--muted)", padding: "24px 0" }}>Корзина пуста</p>
-            ) : (
-              <div className="trash-list">
-                {trash.map((p) => (
-                  <div key={p.id} className="trash-item">
-                    {p.imageUrl ? (
-                      <img src={p.imageUrl} alt="" className="trash-item__img" />
-                    ) : (
-                      <div className="trash-item__img trash-item__img--empty" />
-                    )}
-                    <div className="trash-item__info">
-                      <b>{p.title}</b>
-                      <span>{p.article || "—"}</span>
-                    </div>
-                    <div className="trash-item__actions">
-                      <Button variant="outline" size="sm" onClick={() => restoreProduct(p)}>
-                        Восстановить
-                      </Button>
-                      <Button variant="accent" size="sm" onClick={() => deletePermanently(p)}>
-                        Навсегда
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </section>
   );
 }

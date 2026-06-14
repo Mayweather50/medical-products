@@ -50,6 +50,7 @@ const PATHS = {
   menu: ["path:M4 7h16", "path:M4 12h16", "path:M4 17h16"],
   user: ["circle:12 8 3.5", "path:M5 20a7 7 0 0114 0"],
   logout: ["path:M14 4h-7v16h7", "path:M10 12h10", "path:M17 9l3 3-3 3"],
+  trash: ["path:M4 7h16", "path:M10 11v6", "path:M14 11v6", "path:M5 7l1 12a2 2 0 002 2h8a2 2 0 002-2l1-12", "path:M9 7V4h6v3"],
 };
 
 const CAT_PATHS = {
