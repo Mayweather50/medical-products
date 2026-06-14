@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import HomePage from "./pages/HomePage";
@@ -17,28 +16,8 @@ import { CatalogProvider } from "./context/CatalogContext";
 import { LeadModalProvider } from "./context/LeadModalContext";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
+import { ToastProvider } from "./components/Toast";
 
-/* Скролл при навигации: к якорю из hash (с поправкой на липкую шапку)
-   или наверх страницы. */
-function ScrollManager() {
-  const { pathname, hash } = useLocation();
-
-  useEffect(() => {
-    requestAnimationFrame(() => {
-      if (hash) {
-        const el = document.getElementById(hash.slice(1));
-        if (el) {
-          const top = el.getBoundingClientRect().top + window.pageYOffset - 150;
-          window.scrollTo({ top, behavior: "smooth" });
-          return;
-        }
-      }
-      window.scrollTo({ top: 0, behavior: "auto" });
-    });
-  }, [pathname, hash]);
-
-  return null;
-}
 
 export default function App() {
   return (
@@ -47,7 +26,7 @@ export default function App() {
         <CatalogProvider>
           <CartProvider>
             <LeadModalProvider>
-              <ScrollManager />
+              <ToastProvider>
               <Header />
               <main className="app-main">
                 <Routes>
@@ -66,6 +45,7 @@ export default function App() {
                 </Routes>
               </main>
               <Footer />
+              </ToastProvider>
             </LeadModalProvider>
           </CartProvider>
         </CatalogProvider>

@@ -37,6 +37,10 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     @EntityGraph(attributePaths = "category")
     List<Product> findTop12ByPopularTrueAndAvailableTrueOrderByCreatedAtDesc();
 
+    @Query(value = "SELECT p.* FROM products p JOIN categories c ON p.category_id = c.id WHERE p.deleted_at IS NOT NULL ORDER BY p.deleted_at DESC",
+            nativeQuery = true)
+    List<Product> findDeleted();
+
     /**
      * Переопределяем метод из JpaSpecificationExecutor, чтобы категория
      * подтягивалась одним запросом (защита от N+1 на страницах каталога).

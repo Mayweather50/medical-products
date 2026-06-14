@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { Loading, LoadError } from "../../components/StateBlock";
 import Button from "../../components/Button";
 import StatusBadge from "../../components/StatusBadge";
+import { useToast } from "../../components/Toast";
 import { api } from "../../api";
 import { ORDER_STATUS_LABELS, STATUS_VALUES, fmtDate } from "./statuses";
 
 const PAGE_SIZE = 20;
 
 export default function AdminOrders() {
+  const toast = useToast();
   const [page, setPage] = useState(0);
   const [state, setState] = useState({ data: null, loading: true, error: null });
 
@@ -31,7 +33,7 @@ export default function AdminOrders() {
         },
       }));
     } catch (err) {
-      alert("Не удалось обновить статус: " + err.message);
+      toast.error("Не удалось обновить статус: " + err.message);
     }
   };
 

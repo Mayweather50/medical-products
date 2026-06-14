@@ -110,6 +110,34 @@ public class ProductService {
         log.info("Product soft-deleted: id={}, title='{}'", id, product.getTitle());
     }
 
+    @Transactional(readOnly = true)
+    public List<ProductResponse> getDeleted() {
+        return productRepository.findDeleted().stream()
+                .map(productMapper::toResponse)
+                .toList();
+    }
+
+    @Transactional
+    public ProductResponse restore(Long id) {
+        Product product = productRepository.findDeleted().stream()
+                .filter(p -> p.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Deleted product with id " + id + " not found"));
+        product.setDeletedAt(null);
+        log.info("Product restored: id={}, title='{}'", id, product.getTitle());
+        return productMapper.toResponse(product);
+    }
+
+    @Transactional
+    public void deletePermanently(Long id) {
+        Product product = productRepository.findDeleted().stream()
+                .filter(p -> p.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Deleted product with id " + id + " not found"));
+        productRepository.delete(product);
+        log.info("Product permanently deleted: id={}, title='{}'", id, product.getTitle());
+    }
+
     private Product findById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product with id " + id + " not found"));

@@ -96,6 +96,9 @@ export const api = {
     updateProduct: (id, payload) =>
       request(`/api/admin/products/${id}`, { method: "PUT", body: JSON.stringify(payload) }),
     deleteProduct: (id) => request(`/api/admin/products/${id}`, { method: "DELETE" }),
+    getTrash: () => request("/api/admin/products/trash"),
+    restoreProduct: (id) => request(`/api/admin/products/trash/${id}/restore`, { method: "POST" }),
+    deleteProductPermanently: (id) => request(`/api/admin/products/trash/${id}`, { method: "DELETE" }),
     importProducts: (file) => {
       const fd = new FormData();
       fd.append("file", file);

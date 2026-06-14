@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 @Tag(name = "Admin: Products", description = "Управление товарами")
@@ -48,6 +50,25 @@ public class AdminProductController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         productService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Корзина удалённых товаров")
+    @GetMapping("/trash")
+    public List<ProductResponse> getTrash() {
+        return productService.getDeleted();
+    }
+
+    @Operation(summary = "Восстановить товар из корзины")
+    @PostMapping("/trash/{id}/restore")
+    public ProductResponse restore(@PathVariable Long id) {
+        return productService.restore(id);
+    }
+
+    @Operation(summary = "Удалить товар навсегда")
+    @DeleteMapping("/trash/{id}")
+    public ResponseEntity<Void> deletePermanently(@PathVariable Long id) {
+        productService.deletePermanently(id);
         return ResponseEntity.noContent().build();
     }
 

@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Loading, LoadError } from "../../components/StateBlock";
 import Button from "../../components/Button";
+import ConfirmModal from "../../components/ConfirmModal";
 import { Icon } from "../../components/Icon";
+import { useToast } from "../../components/Toast";
 import { api } from "../../api";
 import { fmtPrice } from "../../lib/format";
 import { useCatalog } from "../../context/CatalogContext";
@@ -53,10 +55,14 @@ const slugify = (s) =>
     .replace(/^-+|-+$/g, "");
 
 export default function AdminProducts() {
+  const toast = useToast();
   const { categories, reload: reloadCategories } = useCatalog();
   const [page, setPage] = useState(0);
   const [query, setQuery] = useState("");
   const [state, setState] = useState({ data: null, loading: true, error: null });
+  const [showTrash, setShowTrash] = useState(false);
+  const [trash, setTrash] = useState([]);
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   const [editing, setEditing] = useState(null); // null | { product|null, form }
   const [formErrors, setFormErrors] = useState({});
@@ -147,14 +153,49 @@ export default function AdminProducts() {
     }
   };
 
-  const remove = async (p) => {
-    if (!confirm(`Удалить товар «${p.title}»?`)) return;
+  const remove = (p) => setConfirmDelete(p);
+
+  const doRemove = async () => {
+    const p = confirmDelete;
+    setConfirmDelete(null);
     try {
       await api.admin.deleteProduct(p.id);
+      toast.success(`Товар «${p.title}» перемещён в корзину`);
       load();
       reloadCategories?.();
     } catch (err) {
-      alert("Не удалось удалить: " + err.message);
+      toast.error("Не удалось удалить: " + err.message);
+    }
+  };
+
+  const loadTrash = async () => {
+    try {
+      const data = await api.admin.getTrash();
+      setTrash(data);
+      setShowTrash(true);
+    } catch (err) {
+      toast.error("Не удалось загрузить корзину: " + err.message);
+    }
+  };
+
+  const restoreProduct = async (p) => {
+    try {
+      await api.admin.restoreProduct(p.id);
+      toast.success(`Товар «${p.title}» восстановлен`);
+      setTrash((prev) => prev.filter((t) => t.id !== p.id));
+      load();
+    } catch (err) {
+      toast.error("Не удалось восстановить: " + err.message);
+    }
+  };
+
+  const deletePermanently = async (p) => {
+    try {
+      await api.admin.deleteProductPermanently(p.id);
+      toast.success(`Товар «${p.title}» удалён навсегда`);
+      setTrash((prev) => prev.filter((t) => t.id !== p.id));
+    } catch (err) {
+      toast.error("Не удалось удалить: " + err.message);
     }
   };
 
@@ -206,6 +247,9 @@ export default function AdminProducts() {
                   onClick={() => fileRef.current?.click()}>
             {importing ? "Импортируем…" : "Импорт из Excel"}
           </Button>
+          <Button variant="outline" size="sm" onClick={loadTrash}>
+            Корзина
+          </Button>
           <Button variant="primary" size="sm" icon="plus" onClick={openCreate}>
             Добавить товар
           </Button>
@@ -245,6 +289,7 @@ export default function AdminProducts() {
               <thead>
                 <tr>
                   <th>№</th>
+                  <th></th>
                   <th>Название</th>
                   <th>Артикул</th>
                   <th>Категория</th>
@@ -257,6 +302,13 @@ export default function AdminProducts() {
                 {d.content.map((p) => (
                   <tr key={p.id}>
                     <td>{p.id}</td>
+                    <td>
+                      {p.imageUrl ? (
+                        <img src={p.imageUrl} alt="" className="admin-table__thumb" />
+                      ) : (
+                        <div className="admin-table__thumb admin-table__thumb--empty" />
+                      )}
+                    </td>
                     <td className="admin-table__txt"><b>{p.title}</b></td>
                     <td><code>{p.article}</code></td>
                     <td>{p.category.title}</td>
@@ -430,6 +482,56 @@ export default function AdminProducts() {
                 </Button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      <ConfirmModal
+        open={!!confirmDelete}
+        title="Удалить товар?"
+        message={confirmDelete ? `«${confirmDelete.title}» будет перемещён в корзину. Вы сможете восстановить его позже.` : ""}
+        confirmLabel="Удалить"
+        danger
+        onConfirm={doRemove}
+        onCancel={() => setConfirmDelete(null)}
+      />
+
+      {showTrash && (
+        <div className="modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setShowTrash(false); }}>
+          <div className="modal modal--wide" role="dialog" aria-modal="true">
+            <button className="modal__close" onClick={() => setShowTrash(false)} aria-label="Закрыть">
+              <Icon name="close" size={20} />
+            </button>
+            <div className="modal__head">
+              <h3>Корзина {trash.length > 0 && <small>({trash.length})</small>}</h3>
+            </div>
+            {trash.length === 0 ? (
+              <p style={{ color: "var(--muted)", padding: "24px 0" }}>Корзина пуста</p>
+            ) : (
+              <div className="trash-list">
+                {trash.map((p) => (
+                  <div key={p.id} className="trash-item">
+                    {p.imageUrl ? (
+                      <img src={p.imageUrl} alt="" className="trash-item__img" />
+                    ) : (
+                      <div className="trash-item__img trash-item__img--empty" />
+                    )}
+                    <div className="trash-item__info">
+                      <b>{p.title}</b>
+                      <span>{p.article || "—"}</span>
+                    </div>
+                    <div className="trash-item__actions">
+                      <Button variant="outline" size="sm" onClick={() => restoreProduct(p)}>
+                        Восстановить
+                      </Button>
+                      <Button variant="accent" size="sm" onClick={() => deletePermanently(p)}>
+                        Навсегда
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Loading, LoadError } from "../../components/StateBlock";
 import Button from "../../components/Button";
+import ConfirmModal from "../../components/ConfirmModal";
 import { Icon, CatIcon } from "../../components/Icon";
+import { useToast } from "../../components/Toast";
 import { api } from "../../api";
 import { useCatalog } from "../../context/CatalogContext";
 
@@ -36,10 +38,12 @@ function iconFromImageUrl(imageUrl) {
 }
 
 export default function AdminCategories() {
+  const toast = useToast();
   const { categories, loading, error, reload } = useCatalog();
   const [editing, setEditing] = useState(null);
   const [formErrors, setFormErrors] = useState({});
   const [saving, setSaving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   useEffect(() => { reload(); }, []);
 
@@ -94,13 +98,17 @@ export default function AdminCategories() {
     }
   };
 
-  const remove = async (c) => {
-    if (!confirm(`Удалить категорию «${c.title}»?`) ) return;
+  const remove = (c) => setConfirmDelete(c);
+
+  const doRemove = async () => {
+    const c = confirmDelete;
+    setConfirmDelete(null);
     try {
       await api.admin.deleteCategory(c.id);
+      toast.success(`Категория «${c.title}» удалена`);
       reload();
     } catch (err) {
-      alert("Не удалось удалить: " + err.message);
+      toast.error("Не удалось удалить: " + err.message);
     }
   };
 
@@ -234,6 +242,16 @@ export default function AdminCategories() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        open={!!confirmDelete}
+        title="Удалить категорию?"
+        message={confirmDelete ? `Категория «${confirmDelete.title}» будет удалена.` : ""}
+        confirmLabel="Удалить"
+        danger
+        onConfirm={doRemove}
+        onCancel={() => setConfirmDelete(null)}
+      />
     </section>
   );
 }
