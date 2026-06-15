@@ -5,7 +5,6 @@ import { Icon, CatIcon } from "./Icon";
 import { catalogUrl, plural } from "../lib/format";
 import { useCatalog } from "../context/CatalogContext";
 import { useLeadModal } from "../context/LeadModalContext";
-import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 
 const BRAND = "Медкор";
@@ -14,7 +13,6 @@ export default function Header() {
   const navigate = useNavigate();
   const { categories } = useCatalog();
   const openLead = useLeadModal();
-  const cart = useCart();
   const { user, isAdmin, logout } = useAuth();
   const [search, setSearch] = useState("");
   const [catOpen, setCatOpen] = useState(false);
@@ -120,10 +118,6 @@ export default function Header() {
               <Icon name={user && !isAdmin ? "logout" : "user"} size={21} />
               {user && <span className="head-icobtn__dot" />}
             </Link>
-            <Link className="head-icobtn" to="/cart" aria-label="Корзина" onClick={() => setMenuOpen(false)}>
-              <Icon name="cart" size={21} />
-              {cart.count > 0 && <span className="head-icobtn__n">{cart.count}</span>}
-            </Link>
             <button
               className="head-burger"
               aria-label={menuOpen ? "Закрыть меню" : "Открыть меню"}
@@ -216,9 +210,6 @@ export default function Header() {
           </nav>
 
           <nav className="mobile-menu__links">
-            <Link to="/cart" onClick={() => setMenuOpen(false)}>
-              Корзина{cart.count > 0 ? ` (${cart.count})` : ""}
-            </Link>
             <Link to={catalogUrl({ popular: true })} onClick={() => setMenuOpen(false)}>Популярное</Link>
             <Link to="/#advantages" onClick={() => setMenuOpen(false)}>Почему мы</Link>
             <Link to="/#certificates" onClick={() => setMenuOpen(false)}>Сертификаты</Link>
