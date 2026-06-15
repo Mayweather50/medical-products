@@ -14,9 +14,12 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 RUN addgroup -S app && adduser -S app -G app
+
+# Каталог для загруженных изображений (монтируется как том), владелец — app
+RUN mkdir -p /app/uploads && chown -R app:app /app
 USER app
 
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build --chown=app:app /app/target/*.jar app.jar
 
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

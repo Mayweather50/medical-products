@@ -5,6 +5,9 @@ target/
 node_modules/
 frontend/dist/
 
+# Загруженные изображения товаров (хранятся в томе/на диске, не в репозитории)
+uploads/
+
 # IDE
 .idea/
 *.iml

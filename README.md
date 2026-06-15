@@ -42,6 +42,7 @@ Backend отдаёт только DTO, фильтрация каталога —
 
 ```bash
 cp .env.example .env
+# отредактируйте .env: задайте пароли БД, JWT_SECRET и ADMIN_PASSWORD
 docker compose up -d --build
 ```
 
@@ -52,14 +53,57 @@ docker compose up -d --build
 | Swagger UI | http://localhost:8080/swagger-ui.html |
 | OpenAPI JSON | http://localhost:8080/api-docs |
 
-В production-сборке nginx фронтенда проксирует `/api` на backend — фронт и API живут на одном origin, CORS не задействован.
+В production-сборке nginx фронтенда проксирует `/api` и `/uploads` на backend — фронт, API и загруженные картинки живут на одном origin, CORS не задействован.
 
 Остановка:
 
 ```bash
 docker compose down          # остановить
-docker compose down -v       # остановить и удалить данные БД
+docker compose down -v       # остановить и удалить данные БД + загруженные картинки
 ```
+
+## Деплой на сервер
+
+Требуется только установленный Docker с плагином Compose. На production почти всё то же, что и локально, но с реальными секретами.
+
+1. Скопировать проект на сервер (git clone или rsync).
+2. Создать и заполнить `.env` (значения **обязательно** сменить):
+
+   ```bash
+   cp .env.example .env
+   nano .env
+   ```
+
+   Минимум, что нужно задать:
+   - `POSTGRES_PASSWORD` и тот же пароль в `SPRING_DATASOURCE_PASSWORD`
+   - `JWT_SECRET` — длинный случайный ключ: `openssl rand -base64 48`
+   - `ADMIN_PASSWORD` — пароль администратора (логин по умолчанию `admin`)
+
+   > `JWT_SECRET` и `ADMIN_PASSWORD` обязательны — compose не стартует, если они пустые.
+
+3. Поднять стек:
+
+   ```bash
+   docker compose up -d --build
+   ```
+
+4. Открыть `http://<сервер>:3000` (витрина) и войти в админку `/login`
+   под `admin` / `ADMIN_PASSWORD`.
+
+**Что сохраняется между перезапусками** (именованные тома Docker):
+- `postgres_data` — база данных
+- `uploads_data` — загруженные изображения товаров (`/app/uploads` в контейнере)
+
+Резервная копия БД:
+
+```bash
+docker compose exec postgres pg_dump -U medical medical_products > backup.sql
+```
+
+> Для публикации в интернет поставьте перед фронтендом обратный прокси
+> (nginx/Caddy/Traefik) с HTTPS-сертификатом и проксируйте 80/443 → порт 3000
+> контейнера frontend. Порт backend `8080` наружу можно не публиковать —
+> фронтенд ходит к нему внутри docker-сети.
 
 ## Локальная разработка
 
@@ -140,9 +184,8 @@ Frontend разбирает `fieldErrors` и подсвечивает соотв
 
 ## Что дальше
 
-- Загрузка файлов (изображения товаров, PDF сертификатов) в S3/MinIO
-- Корзина и оформление заказа на фронтенде (API `/api/orders` уже готов)
-- Админ-панель на фронтенде (API `/api/admin/**` уже защищён JWT)
+- Хранение изображений во внешнем объектном хранилище (S3/MinIO) вместо локального тома
 - Полнотекстовый поиск (PostgreSQL `tsvector` или Elasticsearch)
 - Кэширование каталога (Spring Cache + Redis)
 - Интеграционные тесты на Testcontainers
+- HTTPS через обратный прокси (Caddy/Traefik) перед стеком
