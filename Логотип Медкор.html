@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ugodent — логотип</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --primary:#0e7c7b; --deep:#0b5f5e; --press:#094c4b;
+    --soft:#e3f1f0; --softer:#eef7f6;
+    --accent:#d9683a; --accent-deep:#bf552c;
+    --ink:#0c2123; --ink-2:#3b504f; --muted:#6c807e;
+    --bg:#f4f7f7; --surface:#fff; --line:#e3eae9; --line-2:#eef2f1;
+    --ink-bg:#0b2426;
+    --font:"Onest",system-ui,sans-serif; --mono:"JetBrains Mono",monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--font);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px;}
+  h1,h2,h3,h4{margin:0;letter-spacing:-0.02em;line-height:1.1;font-weight:800;}
+  p{margin:0;}
+
+  /* Page head */
+  .phead{padding:64px 0 40px;border-bottom:1px solid var(--line);}
+  .phead .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--deep);background:var(--soft);padding:7px 14px;border-radius:999px;margin-bottom:22px;}
+  .phead .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--primary);box-shadow:0 0 0 4px rgba(14,124,123,.18);}
+  .phead h1{font-size:clamp(32px,4vw,46px);}
+  .phead p{font-size:17px;color:var(--muted);margin-top:14px;max-width:62ch;}
+
+  .section{padding:56px 0;}
+  .section + .section{border-top:1px solid var(--line);}
+  .sec-h{display:flex;align-items:baseline;gap:14px;margin-bottom:30px;}
+  .sec-h .n{font-family:var(--mono);font-size:13px;color:var(--primary);font-weight:500;}
+  .sec-h h2{font-size:24px;}
+  .sec-h p{font-size:14px;color:var(--muted);margin-left:auto;}
+
+  /* Hero primary lockup */
+  .hero-logo{background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:72px 48px;display:flex;align-items:center;justify-content:center;box-shadow:0 26px 60px -34px rgba(11,70,69,.28);position:relative;overflow:hidden;}
+  .hero-logo::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--line-2) 1px,transparent 1px),linear-gradient(90deg,var(--line-2) 1px,transparent 1px);background-size:28px 28px;opacity:.5;mask-image:radial-gradient(circle at 50% 50%,#000 20%,transparent 72%);}
+
+  /* Logo lockup */
+  .lock{display:inline-flex;align-items:center;gap:18px;position:relative;}
+  .lock .mark{flex-shrink:0;}
+  .lock .wm{display:flex;flex-direction:column;}
+  .lock .wm .name{font-size:46px;font-weight:800;letter-spacing:-0.04em;line-height:.95;color:var(--ink);}
+  .lock .wm .name em{font-style:normal;color:var(--primary);}
+  .lock .wm .tag{font-size:12.5px;font-weight:600;letter-spacing:.34em;text-transform:uppercase;color:var(--muted);margin-top:9px;padding-left:2px;}
+
+  .lock--sm .wm .name{font-size:27px;}
+  .lock--sm .wm .tag{font-size:9px;letter-spacing:.28em;margin-top:5px;}
+  .lock--stack{flex-direction:column;gap:16px;text-align:center;}
+  .lock--stack .wm{align-items:center;}
+
+  /* Concept grid */
+  .concepts{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+  .concept{background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden;transition:box-shadow .18s ease,border-color .18s ease,transform .18s ease;}
+  .concept:hover{box-shadow:0 18px 40px -24px rgba(12,33,35,.22);border-color:#cfe0df;transform:translateY(-3px);}
+  .concept__stage{height:188px;display:flex;align-items:center;justify-content:center;background:linear-gradient(150deg,#fbfdfd,#eef4f3 70%);position:relative;}
+  .concept__foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-top:1px solid var(--line-2);}
+  .concept__foot b{font-size:15px;font-weight:700;}
+  .concept__foot small{font-size:12.5px;color:var(--muted);display:block;margin-top:2px;}
+  .concept__tag{font-family:var(--mono);font-size:11px;color:var(--primary);background:var(--softer);padding:5px 9px;border-radius:7px;flex-shrink:0;}
+  .concept.is-primary .concept__stage{background:linear-gradient(150deg,var(--softer),var(--soft));}
+  .pickbadge{position:absolute;top:14px;left:14px;font-size:11px;font-weight:700;color:var(--deep);background:#fff;border:1px solid var(--soft);padding:5px 11px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;}
+  .pickbadge .dot{width:6px;height:6px;border-radius:50%;background:var(--primary);}
+
+  /* Usage rows */
+  .usage{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .ucard{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:0;overflow:hidden;}
+  .ucard__stage{height:150px;display:flex;align-items:center;justify-content:center;}
+  .ucard__stage--light{background:var(--surface);}
+  .ucard__stage--soft{background:var(--softer);}
+  .ucard__stage--ink{background:var(--ink-bg);}
+  .ucard__stage--teal{background:linear-gradient(150deg,var(--primary),var(--deep));}
+  .ucard__lbl{padding:13px 18px;border-top:1px solid var(--line-2);font-size:13px;font-weight:600;color:var(--ink-2);}
+  .ucard__lbl small{color:var(--muted);font-weight:500;}
+
+  /* Favicon row */
+  .favs{display:flex;align-items:flex-end;gap:28px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:34px 32px;}
+  .fav{display:flex;flex-direction:column;align-items:center;gap:11px;}
+  .fav span{font-family:var(--mono);font-size:11px;color:var(--muted);}
+  .fav .browsertab{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:9px 9px 0 0;padding:9px 14px;font-size:12.5px;color:var(--ink-2);font-weight:500;}
+
+  /* Palette */
+  .pal{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
+  .sw{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface);}
+  .sw__c{height:84px;}
+  .sw__m{padding:11px 13px;}
+  .sw__m b{font-size:13px;font-weight:600;display:block;}
+  .sw__m code{font-family:var(--mono);font-size:11px;color:var(--muted);}
+
+  /* clearspace / dont */
+  .rules{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .rule{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:26px;}
+  .rule h4{font-size:15px;margin-bottom:8px;}
+  .rule p{font-size:13.5px;color:var(--muted);}
+  .clearbox{margin-top:18px;height:150px;border-radius:12px;background:repeating-linear-gradient(45deg,var(--softer),var(--softer) 8px,transparent 8px,transparent 16px);display:flex;align-items:center;justify-content:center;position:relative;}
+  .clearbox .inner{background:#fff;border:1px dashed var(--primary);padding:24px;border-radius:8px;}
+
+  .pfoot{padding:40px 0 70px;color:var(--muted);font-size:13px;}
+</style>
+</head>
+<body>
+
+<!-- Reusable SVG marks -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="tealgrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#11908e"/>
+      <stop offset="1" stop-color="#0a5b5a"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<header class="phead">
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span>Айдентика · Ugodent</span>
+    <h1>Логотип «Ugodent»</h1>
+    <p>Знак построен на медицинском кресте и линии пульса в фирменном клиническом тиле. Ниже — рекомендованный вариант, альтернативные концепции, версии для разных фонов и фавикон.</p>
+  </div>
+</header>
+
+<!-- PRIMARY -->
+<section class="section">
+  <div class="wrap">
+    <div class="sec-h"><span class="n">01</span><h2>Основной логотип</h2><p>Горизонтальная блокировка · знак + начертание</p></div>
+    <div class="hero-logo">
+      <div class="lock" id="primaryLock"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section class="section">
+  <div class="wrap">
+    <div class="sec-h"><span class="n">02</span><h2>Концепции знака</h2><p>4 направления — выберите одно</p></div>
+    <div class="concepts" id="concepts"></div>
+  </div>
+</section>
+
+<!-- LOCKUPS / BACKGROUNDS -->
+<section class="section">
+  <div class="wrap">
+    <div class="sec-h"><span class="n">03</span><h2>Версии и фоны</h2><p>Поведение на разных подложках</p></div>
+    <div class="usage" id="usage"></div>
+  </div>
+</section>
+
+<!-- FAVICON -->
+<section class="section">
+  <div class="wrap">
+    <div class="sec-h"><span class="n">04</span><h2>Иконка и фавикон</h2><p>Минимальные размеры знака</p></div>
+    <div class="favs" id="favs"></div>
+  </div>
+</section>
+
+<!-- PALETTE -->
+<section class="section">
+  <div class="wrap">
+    <div class="sec-h"><span class="n">05</span><h2>Палитра</h2><p>Цвета логотипа</p></div>
+    <div class="pal" id="pal"></div>
+  </div>
+</section>
+
+<!-- RULES -->
+<section class="section">
+  <div class="wrap">
+    <div class="sec-h"><span class="n">06</span><h2>Охранное поле и запреты</h2></div>
+    <div class="rules">
+      <div class="rule">
+        <h4>Охранное поле</h4>
+        <p>Свободное пространство вокруг логотипа — не меньше высоты перекладины креста со всех сторон.</p>
+        <div class="clearbox"><div class="inner" id="clearLock"></div></div>
+      </div>
+      <div class="rule">
+        <h4>Чего не делать</h4>
+        <p>Не растягивать, не менять цвета вне палитры, не добавлять тени и обводки, не разворачивать знак, не размещать на пёстром фоне без подложки.</p>
+        <div class="clearbox" style="background:#fff;border:1px solid var(--line);">
+          <div class="lock lock--sm" id="dontLock" style="filter:saturate(.3);transform:skewX(-9deg);opacity:.85;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap pfoot">Ugodent · фирменный знак. Шрифт начертания — Onest. Основной цвет — тил #0E7C7B.</div>
+
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100" height="100" fill="#0e7c7b"/>
+    <path d="M42 22h16v20h20v16H58v20H42V58H22V42h20z" fill="#fff"/>
+  </svg>
+</template>
+
+<script>
+/* ---- Mark builders (return SVG string). size = tile px ---- */
+function tile(size, rx, inner, bg){
+  return `<svg class="mark" width="${size}" height="${size}" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ugodent">
+    <rect width="56" height="56" rx="${rx}" fill="${bg||'url(#tealgrad)'}"/>${inner}</svg>`;
+}
+
+/* A — Vital Cross: white rounded cross + ECG notch through the bar */
+function markVital(size, opts){
+  opts=opts||{};
+  const rx=size*0.27;
+  const cross='#ffffff';
+  const inner = `
+    <g>
+      <rect x="23.2" y="11" width="9.6" height="34" rx="3.4" fill="${cross}"/>
+      <rect x="11" y="23.2" width="34" height="9.6" rx="3.4" fill="${cross}"/>
+    </g>
+    <path d="M11 28 h6.5 l2.8 -6 l3.4 12 l3 -8.4 l2 2.4 h8.3" fill="none" stroke="#0b5f5e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`;
+  return tile(size, rx, inner, opts.bg);
+}
+/* mono (single color, for tiny / favicon) */
+function markVitalMono(size, color, tileColor){
+  const rx=size*0.27;
+  const inner=`<g><rect x="23.2" y="11" width="9.6" height="34" rx="3.4" fill="${color}"/><rect x="11" y="23.2" width="34" height="9.6" rx="3.4" fill="${color}"/></g>`;
+  return tile(size, rx, inner, tileColor);
+}
+
+/* B — Monogram: Cyrillic М with warm pulse valley */
+function markMono(size, opts){
+  opts=opts||{};
+  const rx=size*0.27;
+  const inner=`
+    <path d="M13 42 V16 h4.5 L28 33 L38.5 16 H43 V42 H38 V25 L28.8 39 H27.2 L18 25 V42 Z" fill="#ffffff"/>
+    <rect x="25.4" y="40.5" width="5.2" height="5.2" rx="1.4" fill="#d9683a"/>`;
+  return tile(size, rx, inner, opts.bg);
+}
+
+/* C — Soft Care Cross: four rounded petals */
+function markCare(size, opts){
+  opts=opts||{};
+  const rx=size*0.30;
+  const inner=`
+    <g fill="#ffffff">
+      <rect x="22.5" y="9.5" width="11" height="17" rx="5.5"/>
+      <rect x="22.5" y="29.5" width="11" height="17" rx="5.5"/>
+      <rect x="9.5" y="22.5" width="17" height="11" rx="5.5"/>
+      <rect x="29.5" y="22.5" width="17" height="11" rx="5.5"/>
+    </g>
+    <circle cx="28" cy="28" r="4.1" fill="#0b5f5e"/>`;
+  return tile(size, rx, inner, opts.bg);
+}
+
+/* D — Shield Plus: protection mark */
+function markShield(size, opts){
+  opts=opts||{};
+  const rx=size*0.27;
+  const inner=`
+    <path d="M28 11 L41 15.4 V27 c0 8.4 -5.6 13.8 -13 16.6 C20.6 40.8 15 35.4 15 27 V15.4 Z" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linejoin="round"/>
+    <g fill="#ffffff"><rect x="25.7" y="19" width="4.6" height="15" rx="1.8"/><rect x="20.5" y="24.2" width="15" height="4.6" rx="1.8"/></g>`;
+  return tile(size, rx, inner, opts.bg);
+}
+
+const MARKS = {
+  vital:{fn:markVital, name:"Vital Cross", note:"Крест + линия пульса", tag:"рекомендуем", primary:true},
+  mono:{fn:markMono, name:"Монограмма «М»", note:"Буква М с акцентом-пульсом", tag:"альтернатива"},
+  care:{fn:markCare, name:"Soft Care", note:"Мягкий крест из лепестков", tag:"альтернатива"},
+  shield:{fn:markShield, name:"Shield Plus", note:"Щит — защита и доверие", tag:"альтернатива"},
+};
+
+function wm(cls){
+  return `<div class="wm"><span class="name">Мед<em>кор</em></span><span class="tag">медицинские товары</span></div>`;
+}
+
+/* primary lockup */
+document.getElementById('primaryLock').innerHTML = markVital(76,{}) + wm();
+
+/* concepts */
+document.getElementById('concepts').innerHTML = Object.entries(MARKS).map(([k,m])=>`
+  <div class="concept ${m.primary?'is-primary':''}">
+    <div class="concept__stage">
+      ${m.primary?'<span class="pickbadge"><span class="dot"></span>Рекомендуем</span>':''}
+      ${m.fn(96,{})}
+    </div>
+    <div class="concept__foot">
+      <div><b>${m.name}</b><small>${m.note}</small></div>
+      <span class="concept__tag">${m.tag}</span>
+    </div>
+  </div>`).join('');
+
+/* usage backgrounds (using primary mark) */
+const usages = [
+  {cls:'light', label:'На светлом', sub:'основной фон', lock:()=>markVital(56,{})+wmSmall('ink')},
+  {cls:'soft', label:'На тонированном', sub:'софт-тил', lock:()=>markVital(56,{})+wmSmall('ink')},
+  {cls:'ink', label:'На тёмном', sub:'инверсия', lock:()=>markVital(56,{})+wmSmall('white')},
+  {cls:'teal', label:'На фирменном тиле', sub:'выворотка', lock:()=>markVitalMono(56,'#ffffff','rgba(255,255,255,0.16)')+wmSmall('white')},
+  {cls:'light', label:'Монохром (тёмный)', sub:'1 цвет', lock:()=>markVitalMono(56,'#fff','#0c2123')+wmSmall('ink')},
+  {cls:'light', label:'Только знак', sub:'для соцсетей/иконки', lock:()=>markVital(64,{})},
+];
+function wmSmall(tone){
+  const nameColor = tone==='white' ? '#ffffff' : 'var(--ink)';
+  const emColor = tone==='white' ? '#7fd9c8' : 'var(--primary)';
+  const tagColor = tone==='white' ? 'rgba(255,255,255,.6)' : 'var(--muted)';
+  return `<div class="wm" style="margin-left:14px"><span class="name" style="font-size:27px;color:${nameColor}">Мед<em style="color:${emColor}">кор</em></span><span class="tag" style="font-size:9px;letter-spacing:.26em;margin-top:5px;color:${tagColor}">медицинские товары</span></div>`;
+}
+document.getElementById('usage').innerHTML = usages.map(u=>`
+  <div class="ucard">
+    <div class="ucard__stage ucard__stage--${u.cls}">
+      <div class="lock lock--sm" style="display:inline-flex;align-items:center">${u.lock()}</div>
+    </div>
+    <div class="ucard__lbl">${u.label} <small>· ${u.sub}</small></div>
+  </div>`).join('');
+
+/* favicons */
+const sizes=[{s:88,l:'app · 88'},{s:64,l:'64'},{s:48,l:'48'},{s:32,l:'32'},{s:16,l:'favicon · 16'}];
+document.getElementById('favs').innerHTML =
+  `<div class="fav"><div class="browsertab">${markVital(16,{})}<span style="font-family:var(--font);color:var(--ink-2)">Ugodent — медтовары</span></div><span>вкладка браузера</span></div>`
+  + sizes.map(z=>`<div class="fav">${markVital(z.s,{})}<span>${z.l}px</span></div>`).join('');
+
+/* palette */
+const pal=[
+  ['Primary','#0e7c7b'],['Deep','#0b5f5e'],['Press','#094c4b'],['Soft','#e3f1f0'],['Accent','#d9683a'],
+];
+document.getElementById('pal').innerHTML = pal.map(p=>`
+  <div class="sw"><div class="sw__c" style="background:${p[1]}"></div><div class="sw__m"><b>${p[0]}</b><code>${p[1].toUpperCase()}</code></div></div>`).join('');
+
+/* clearspace + dont */
+document.getElementById('clearLock').innerHTML = markVital(54,{});
+document.getElementById('dontLock').innerHTML = markVital(48,{}) + wmSmall('ink');
+</script>
+</body>
+</html>

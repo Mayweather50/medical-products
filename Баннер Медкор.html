@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ugodent — рекламный баннер</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --primary:#0e7c7b; --deep:#0b5f5e;
+    --accent:#f0683a; --accent-2:#f59e3c; --accent-deep:#c44d22;
+    --ink:#0c2123; --ink-2:#3b504f; --muted:#6c807e;
+    --bg:#eef1f0; --surface:#fff; --line:#e3eae9;
+    --ink-bg:#0b2426;
+    --font:"Onest",system-ui,sans-serif; --mono:"JetBrains Mono",monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--font);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.4;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
+  h1,h2,h3{margin:0;letter-spacing:-0.02em;font-weight:800;line-height:1.05;}
+  p{margin:0;}
+
+  .phead{padding:56px 0 36px;}
+  .phead .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--accent-deep);background:#fbe6dc;padding:7px 14px;border-radius:999px;margin-bottom:20px;}
+  .phead .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(240,104,58,.18);}
+  .phead h1{font-size:clamp(30px,3.6vw,42px);}
+  .phead p{font-size:16px;color:var(--muted);margin-top:13px;max-width:60ch;}
+
+  .sec{padding:14px 0 38px;}
+  .sec-h{display:flex;align-items:baseline;gap:12px;margin:26px 0 18px;}
+  .sec-h .n{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:500;}
+  .sec-h h2{font-size:20px;}
+  .sec-h .tag{margin-left:auto;font-size:12.5px;color:var(--muted);}
+
+  .stack{display:flex;flex-direction:column;gap:22px;align-items:flex-start;}
+  .bnote{font-size:12.5px;color:var(--muted);margin-top:9px;font-family:var(--mono);}
+  .row{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;}
+  .bwrap{display:flex;flex-direction:column;}
+
+  /* ===== Shared banner internals ===== */
+  .banner{position:relative;overflow:hidden;border-radius:20px;font-family:var(--font);color:#fff;box-shadow:0 18px 40px -22px rgba(12,33,35,.35);}
+  .banner *{box-sizing:border-box;}
+  .b-cta{display:inline-flex;align-items:center;gap:8px;font-weight:700;border-radius:999px;white-space:nowrap;border:none;cursor:pointer;}
+  .b-cta svg{width:1em;height:1em;}
+  .cross{position:absolute;}
+
+  /* ============ STYLE A — Energetic warm ============ */
+  .bA{width:880px;height:210px;background:linear-gradient(115deg,#f0683a 0%,#f59e3c 100%);padding:34px 40px;display:flex;align-items:center;}
+  .bA .blob{position:absolute;right:-60px;top:-70px;width:340px;height:340px;border-radius:50%;background:rgba(255,255,255,.12);}
+  .bA .blob2{position:absolute;right:120px;bottom:-120px;width:230px;height:230px;border-radius:50%;background:rgba(255,255,255,.10);}
+  .bA .dots{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.22) 1.4px,transparent 1.4px);background-size:20px 20px;opacity:.5;mask-image:linear-gradient(90deg,transparent,#000 60%);}
+  .bA__l{position:relative;z-index:2;max-width:62%;}
+  .bA .kick{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700;background:rgba(255,255,255,.2);padding:6px 13px;border-radius:999px;margin-bottom:14px;backdrop-filter:blur(2px);}
+  .bA h3{font-size:33px;line-height:1.02;letter-spacing:-0.03em;text-wrap:balance;}
+  .bA p{font-size:14.5px;opacity:.95;margin-top:10px;font-weight:500;}
+  .bA .b-cta{background:#fff;color:var(--accent-deep);padding:13px 24px;font-size:15px;margin-top:18px;box-shadow:0 8px 20px -8px rgba(0,0,0,.3);}
+  .bA__r{position:relative;z-index:2;margin-left:auto;display:grid;place-items:center;}
+  .bA .ring{width:148px;height:148px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 16px 40px -14px rgba(0,0,0,.35);}
+  .bA .ring b{font-size:52px;font-weight:800;letter-spacing:-0.04em;color:var(--accent);line-height:.9;}
+  .bA .ring span{font-size:13px;font-weight:700;color:var(--accent-deep);}
+
+  /* ============ STYLE B — Dark premium ============ */
+  .bB{width:880px;height:210px;background:radial-gradient(120% 140% at 85% 10%,#10605f 0%,#0b2426 60%);padding:34px 40px;display:flex;align-items:center;border:1px solid rgba(255,255,255,.06);}
+  .bB .grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:34px 34px;mask-image:radial-gradient(circle at 80% 30%,#000,transparent 75%);}
+  .bB .pulse{position:absolute;right:36px;top:50%;transform:translateY(-50%);width:300px;color:rgba(127,217,200,.55);z-index:1;}
+  .bB__l{position:relative;z-index:2;max-width:64%;}
+  .bB .kick{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#7fd9c8;margin-bottom:15px;}
+  .bB .kick::before{content:"";width:26px;height:1.5px;background:#7fd9c8;}
+  .bB h3{font-size:31px;line-height:1.05;letter-spacing:-0.025em;}
+  .bB h3 em{font-style:normal;color:#7fd9c8;}
+  .bB p{font-size:14px;color:#aac4c2;margin-top:11px;}
+  .bB .b-cta{background:#7fd9c8;color:#06302f;padding:12px 22px;font-size:14.5px;margin-top:20px;}
+
+  /* ============ STYLE C — Soft playful ============ */
+  .bC{width:880px;height:210px;background:#fef7f1;color:var(--ink);padding:30px 36px;display:flex;align-items:center;gap:28px;border:1px solid #f6e2d5;}
+  .bC .arc{position:absolute;left:-40px;bottom:-90px;width:260px;height:260px;border-radius:50%;background:#ffe6d6;}
+  .bC .arc2{position:absolute;left:120px;top:-110px;width:180px;height:180px;border-radius:50%;background:#e3f1f0;}
+  .bC__icon{position:relative;z-index:2;width:128px;height:128px;border-radius:32px;background:linear-gradient(150deg,#11908e,#0a5b5a);display:grid;place-items:center;flex-shrink:0;box-shadow:0 14px 30px -12px rgba(11,70,69,.5);}
+  .bC__l{position:relative;z-index:2;display:flex;flex-direction:column;align-items:flex-start;max-width:560px;}
+  .bC .kick{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:var(--deep);background:#dceeed;padding:6px 13px;border-radius:999px;margin-bottom:13px;}
+  .bC h3{font-size:29px;color:var(--ink);letter-spacing:-0.03em;line-height:1.12;white-space:nowrap;}
+  .bC h3 em{font-style:normal;color:var(--accent);}
+  .bC p{font-size:14px;color:var(--ink-2);margin-top:10px;}
+  .bC .b-cta{background:var(--primary);color:#fff;padding:12px 22px;font-size:14.5px;margin-top:17px;}
+
+  /* ===== Standard sizes (Style A language) ===== */
+  .mini{position:relative;overflow:hidden;border-radius:16px;color:#fff;background:linear-gradient(120deg,#f0683a,#f59e3c);box-shadow:0 14px 30px -18px rgba(196,77,34,.6);}
+  .mini .blob{position:absolute;right:-40px;top:-46px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.13);}
+  .mini .kick{font-size:11px;font-weight:700;background:rgba(255,255,255,.22);padding:4px 10px;border-radius:999px;display:inline-block;}
+  .mini .b-cta{background:#fff;color:var(--accent-deep);font-weight:700;}
+
+  /* 300x250 */
+  .m-rect{width:300px;height:250px;padding:22px;display:flex;flex-direction:column;}
+  .m-rect h3{font-size:25px;line-height:1.03;margin-top:13px;letter-spacing:-0.02em;}
+  .m-rect p{font-size:13px;opacity:.95;margin-top:8px;}
+  .m-rect .b-cta{margin-top:auto;align-self:flex-start;padding:11px 20px;font-size:14px;}
+
+  /* 728x90 */
+  .m-lead{width:728px;height:90px;padding:0 24px;display:flex;align-items:center;gap:20px;}
+  .m-lead .txt{display:flex;flex-direction:column;gap:3px;z-index:1;flex-shrink:0;}
+  .m-lead h3{font-size:21px;letter-spacing:-0.02em;white-space:nowrap;}
+  .m-lead p{font-size:13px;opacity:.95;}
+  .m-lead .b-cta{margin-left:auto;padding:11px 22px;font-size:14px;z-index:1;flex-shrink:0;}
+  .m-lead .sep{width:1px;height:40px;background:rgba(255,255,255,.3);z-index:1;flex-shrink:0;}
+
+  /* 320x100 */
+  .m-mob{width:320px;height:100px;padding:0 18px;display:flex;align-items:center;gap:14px;}
+  .m-mob .ico{width:54px;height:54px;border-radius:14px;background:rgba(255,255,255,.2);display:grid;place-items:center;flex-shrink:0;z-index:1;}
+  .m-mob .txt{display:flex;flex-direction:column;gap:2px;z-index:1;min-width:0;}
+  .m-mob h3{font-size:17px;line-height:1.12;}
+  .m-mob p{font-size:11.5px;opacity:.95;}
+  .m-mob .b-cta{margin-left:auto;padding:9px 15px;font-size:12.5px;z-index:1;flex-shrink:0;}
+
+  .szlbl{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:9px;}
+  .pfoot{padding:30px 0 70px;color:var(--muted);font-size:13px;}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#11908e"/><stop offset="1" stop-color="#0a5b5a"/></linearGradient>
+</defs></svg>
+
+<header class="phead">
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span>Промо · Ugodent</span>
+    <h1>Рекламный баннер</h1>
+    <p>Стиль отличается от логотипа — энергичнее и ярче, с тёплым акцентом. Ниже три стилевых направления одного промо и готовые рекламные размеры.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="sec">
+    <div class="sec-h"><span class="n">A</span><h2>Энергичный — тёплый акцент</h2><span class="tag">880 × 210</span></div>
+    <div class="bwrap">
+      <div class="banner bA">
+        <span class="blob"></span><span class="blob2"></span><span class="dots"></span>
+        <div class="bA__l">
+          <span class="kick">⚡ Доставка по РФ от 1 дня</span>
+          <h3>Медтовары и СИЗ — со склада к вам</h3>
+          <p>Сертифицированная продукция, опт и розница, документы в комплекте.</p>
+          <button class="b-cta">В каталог
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+        <div class="bA__r"><div class="ring"><div style="text-align:center"><b>1</b><span style="display:block">день</span></div></div></div>
+      </div>
+      <div class="bnote">Стиль A · тёплый градиент, динамичные формы</div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><span class="n">B</span><h2>Тёмный премиум</h2><span class="tag">880 × 210</span></div>
+    <div class="bwrap">
+      <div class="banner bB">
+        <span class="grid"></span>
+        <svg class="pulse" viewBox="0 0 300 60" preserveAspectRatio="none" fill="none"><path d="M0 30h70l14-22 18 44 14-30 10 18h160" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="bB__l">
+          <span class="kick">Оборудование для клиник</span>
+          <h3>Оснащаем медучреждения <em>под ключ</em></h3>
+          <p>Диагностика, мебель, расходники. Спеццены для оптовых клиентов.</p>
+          <button class="b-cta">Получить прайс
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="bnote">Стиль B · глубокий тил, линия пульса, сдержанно-дорого</div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><span class="n">C</span><h2>Мягкий — дружелюбный</h2><span class="tag">880 × 210</span></div>
+    <div class="bwrap">
+      <div class="banner bC">
+        <span class="arc"></span><span class="arc2"></span>
+        <div class="bC__icon">
+          <svg width="68" height="68" viewBox="0 0 56 56" fill="none"><rect x="22.5" y="9.5" width="11" height="17" rx="5.5" fill="#fff"/><rect x="22.5" y="29.5" width="11" height="17" rx="5.5" fill="#fff"/><rect x="9.5" y="22.5" width="17" height="11" rx="5.5" fill="#fff"/><rect x="29.5" y="22.5" width="17" height="11" rx="5.5" fill="#fff"/><circle cx="28" cy="28" r="4.1" fill="#0b5f5e"/></svg>
+        </div>
+        <div class="bC__l">
+          <span class="kick">Бесплатная консультация</span>
+          <h3>Поможем с <em>выбором</em> товара</h3>
+          <p>Специалист посоветует аналог, рассчитает цену и сроки поставки.</p>
+          <button class="b-cta">Получить консультацию
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="bnote">Стиль C · светлый, округлый, пастельные формы</div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><span class="n">★</span><h2>Готовые размеры</h2><span class="tag">в стиле A</span></div>
+
+    <div class="row">
+      <div class="bwrap">
+        <div class="banner mini m-rect">
+          <span class="blob"></span>
+          <span class="kick" style="align-self:flex-start">⚡ от 1 дня</span>
+          <h3>Медтовары со склада</h3>
+          <p>Опт и розница · документы в комплекте</p>
+          <button class="b-cta">В каталог
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+        <div class="szlbl">300 × 250 · medium rectangle</div>
+      </div>
+
+      <div class="bwrap">
+        <div class="banner mini m-rect" style="background:linear-gradient(120deg,#0e7c7b,#0b5f5e);">
+          <span class="blob"></span>
+          <span class="kick" style="align-self:flex-start;background:rgba(255,255,255,.2)">Клиникам</span>
+          <h3>Оснащение под ключ</h3>
+          <p>Спеццены для оптовых клиентов</p>
+          <button class="b-cta" style="color:var(--deep)">Получить прайс
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+        <div class="szlbl">300 × 250 · вариант в тиле</div>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:26px">
+      <div class="bwrap">
+        <div class="banner mini m-lead">
+          <span class="blob" style="right:-30px;top:-60px;width:130px;height:130px"></span>
+          <div class="txt"><h3>Медтовары и СИЗ со склада</h3><p>Доставка по РФ от 1 дня</p></div>
+          <span class="sep"></span>
+          <button class="b-cta">В каталог
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+        <div class="szlbl">728 × 90 · leaderboard</div>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:26px">
+      <div class="bwrap">
+        <div class="banner mini m-mob">
+          <span class="blob" style="right:-30px;top:-50px;width:110px;height:110px"></span>
+          <div class="ico">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="#fff"><path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg>
+          </div>
+          <div class="txt"><h3>Медтовары со склада</h3><p>Доставка от 1 дня</p></div>
+          <button class="b-cta">Открыть</button>
+        </div>
+        <div class="szlbl">320 × 100 · mobile</div>
+      </div>
+    </div>
+  </section>
+
+  <p class="pfoot">Ugodent · промо-баннеры. Тёплый акцент #F0683A на базе фирменного тила. Шрифт — Onest.</p>
+</div>
+
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100" height="100" rx="18" fill="#f0683a"/>
+    <path d="M42 24h16v18h18v16H58v18H42V58H24V42h18z" fill="#fff"/>
+  </svg>
+</template>
+
+</body>
+</html>

@@ -1,0 +1,10 @@
+# Браузерный профиль (личные данные, куки) — не публиковать
+chrome-profile/
+
+# Логи локального сервера
+server.err.log
+server.out.log
+
+# Системное
+.DS_Store
+Thumbs.db
