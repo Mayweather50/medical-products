@@ -129,20 +129,6 @@ export default function Header() {
       className={"site-head" + (isHome ? " is-home" : "") + (headHidden ? " is-hidden" : "")}
       style={headStyle}
     >
-      <div className="head-top">
-        <div className="wrap head-top__in">
-          <span>
-            <Icon name="truck" size={14} /> Доставка по РФ от 1 дня
-          </span>
-          <span>
-            <Icon name="shield" size={14} /> Все товары сертифицированы
-          </span>
-          <a href="tel:+78001234567">
-            <Icon name="phone" size={14} /> 8 800 123-45-67
-          </a>
-        </div>
-      </div>
-
       <div className="head-main">
         <div className="wrap head-main__in">
           {/* Левая колонка: навигация + каталог */}
