@@ -1201,6 +1201,9 @@ body {
 .hero__point::after, .hero__point::before { display: none; }
 .hero__cta { grid-column: auto; grid-row: auto; place-self: start; flex-direction: row; flex-wrap: wrap; }
 .hero__lead { display: block; max-width: 52ch; color: rgba(37, 36, 42, 0.7); }
+/* Контрастнее «гравированную» часть заголовка, чтобы читалась на металле */
+.hero__title { color: #FAFAFB; text-shadow: 0 1px 26px rgba(0, 0, 0, 0.28); }
+.hero__title-em { color: rgba(250, 250, 251, 0.78); }
 .hero__scroll-copy, .hero__phrases, .hero__scroll-phrase, .hero__veil, .hero__bg { display: none !important; }
 /* Контент главной всегда виден (в прототипе его проявлял motion.js) */
 .home-reveal {
