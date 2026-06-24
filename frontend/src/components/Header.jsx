@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Icon, CatIcon } from "./Icon";
 import Button from "./Button";
 import { catalogUrl, plural } from "../lib/format";
@@ -12,6 +12,8 @@ const BRAND = "Ugodent";
 
 export default function Header() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isHome = location.pathname === "/";
   const { categories } = useCatalog();
   const openLead = useLeadModal();
   const { user, isAdmin, logout } = useAuth();
@@ -20,8 +22,64 @@ export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [catOpen, setCatOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [headReveal, setHeadReveal] = useState(isHome ? 0 : 1);
+  const [headHidden, setHeadHidden] = useState(false);
   const catsRef = useRef(null);
   const searchRef = useRef(null);
+
+  /* Прокрутка на главной: шапка уезжает наверх вместе с баннером и
+     возвращается плашкой после середины страницы (как в прототипе).
+     На остальных страницах — всегда сплошная плашка. */
+  useEffect(() => {
+    if (!isHome) {
+      setHeadReveal(1);
+      setHeadHidden(false);
+      return;
+    }
+    let ticking = false;
+    const clamp01 = (x) => Math.max(0, Math.min(1, x));
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const y = window.pageYOffset || document.documentElement.scrollTop || 0;
+        const vh = window.innerHeight;
+        const hero = document.querySelector(".hero");
+        let heroProgress = 0;
+        if (hero) {
+          const top = hero.getBoundingClientRect().top + y;
+          const max = Math.max(1, hero.offsetHeight - vh);
+          heroProgress = clamp01((y - top) / max);
+        }
+        const maxScroll = Math.max(1, document.documentElement.scrollHeight - vh);
+        const mid = maxScroll * 0.5;
+        let reveal;
+        let hidden;
+        if (catOpen) {
+          reveal = 1; hidden = false;
+        } else if (hero) {
+          if (heroProgress < 0.04) { reveal = 0; hidden = false; }
+          else if (y < mid) { reveal = 0; hidden = true; }
+          else { reveal = 1; hidden = false; }
+        } else {
+          reveal = 1; hidden = false;
+        }
+        setHeadReveal((prev) => (Math.abs(prev - reveal) < 0.01 ? prev : reveal));
+        setHeadHidden((prev) => (prev === hidden ? prev : hidden));
+        ticking = false;
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isHome, catOpen]);
+
+  const mix = (from, to, p) => from.map((v, i) => Math.round(v + (to[i] - v) * p));
+  const headStyle = {
+    "--head-bg-opacity": headReveal.toFixed(3),
+    "--head-fg-rgb": mix([248, 248, 250], [37, 36, 42], headReveal).join(","),
+    "--head-muted-rgb": mix([232, 232, 236], [102, 101, 110], headReveal).join(","),
+  };
 
   /* Тап мимо мегаменю закрывает его (на тач-устройствах нет mouseleave) */
   useEffect(() => {
@@ -67,7 +125,10 @@ export default function Header() {
   };
 
   return (
-    <header className="site-head">
+    <header
+      className={"site-head" + (isHome ? " is-home" : "") + (headHidden ? " is-hidden" : "")}
+      style={headStyle}
+    >
       <div className="head-top">
         <div className="wrap head-top__in">
           <span>
