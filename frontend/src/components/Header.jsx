@@ -6,14 +6,16 @@ import { catalogUrl, plural } from "../lib/format";
 import { useCatalog } from "../context/CatalogContext";
 import { useLeadModal } from "../context/LeadModalContext";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 
-const BRAND = "Медкор";
+const BRAND = "Ugodent";
 
 export default function Header() {
   const navigate = useNavigate();
   const { categories } = useCatalog();
   const openLead = useLeadModal();
   const { user, isAdmin, logout } = useAuth();
+  const { count } = useCart();
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [catOpen, setCatOpen] = useState(false);
@@ -164,6 +166,17 @@ export default function Header() {
               <span>Связаться</span>
               <Icon name="arrowUpRight" size={14} />
             </button>
+
+            <Link
+              className="head-icobtn"
+              to="/cart"
+              onClick={() => setMenuOpen(false)}
+              aria-label="Корзина"
+              title="Корзина"
+            >
+              <Icon name="cart" size={20} />
+              {count > 0 && <span className="head-icobtn__n">{count}</span>}
+            </Link>
 
             <Link
               className="head-icobtn"

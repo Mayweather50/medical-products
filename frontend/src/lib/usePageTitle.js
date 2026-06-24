@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 
-const BRAND = "Медкор";
+const BRAND = "Ugodent";
 
-/** Выставляет document.title вида «Страница — Медкор». */
+/** Выставляет document.title вида «Страница — Ugodent». */
 export function usePageTitle(title) {
   useEffect(() => {
     document.title = title ? `${title} — ${BRAND}` : `${BRAND} — медицинские товары и оборудование`;

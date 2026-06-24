@@ -5,7 +5,7 @@ import { catalogUrl } from "../lib/format";
 import { useCatalog } from "../context/CatalogContext";
 import { useLeadModal } from "../context/LeadModalContext";
 
-const BRAND = "Медкор";
+const BRAND = "Ugodent";
 
 export default function Footer() {
   const { categories } = useCatalog();

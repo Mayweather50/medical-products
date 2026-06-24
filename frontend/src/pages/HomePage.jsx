@@ -6,6 +6,7 @@ import { Icon, CatIcon } from "../components/Icon";
 import { Loading, LoadError } from "../components/StateBlock";
 import { api } from "../api";
 import { catalogUrl, plural } from "../lib/format";
+import { initHeroMotion } from "../lib/heroMotion";
 import { useCatalog } from "../context/CatalogContext";
 import { useLeadModal } from "../context/LeadModalContext";
 
@@ -31,7 +32,7 @@ function Hero() {
         <div className="hero__copy">
           <span className="hero__eyebrow">
             <span className="dot" />
-            Медкор · медтовары · оборудование
+            Ugodent · медтовары · оборудование
           </span>
           <h1 className="hero__title">
             Медтовары, <span className="hero__title-em">которые закрывают задачу</span>
@@ -222,6 +223,8 @@ function Certificates() {
 }
 
 export default function HomePage() {
+  useEffect(() => initHeroMotion(), []);
+
   return (
     <div className="page-home">
       <Hero />
