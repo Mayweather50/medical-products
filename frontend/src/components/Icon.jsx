@@ -24,6 +24,7 @@ const PATHS = {
   search: ["circle:11 11 7", "path:M21 21l-4.3-4.3"],
   arrow: ["path:M5 12h14", "path:M13 5l7 7-7 7"],
   arrowSm: ["path:M4 12h12", "path:M11 6l6 6-6 6"],
+  arrowUpRight: ["path:M7 17L17 7", "path:M9 7h8v8"],
   chevron: ["path:M9 6l6 6-6 6"],
   chevronDown: ["path:M6 9l6 6 6-6"],
   close: ["path:M6 6l12 12", "path:M18 6L6 18"],
