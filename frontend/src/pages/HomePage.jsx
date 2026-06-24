@@ -9,80 +9,50 @@ import { catalogUrl, plural } from "../lib/format";
 import { useCatalog } from "../context/CatalogContext";
 import { useLeadModal } from "../context/LeadModalContext";
 
+const HERO_POINTS = [
+  ["01", "Сертификация", "Регистрационные удостоверения и декларации соответствия на всю продукцию"],
+  ["02", "Поставка", "Расходники, СИЗ и оборудование со склада с доставкой по всей России"],
+  ["03", "Подбор", "Помогаем собрать заказ под профиль клиники, бюджет и нормативы"],
+];
+
 function Hero() {
   const navigate = useNavigate();
-  const { categories } = useCatalog();
   const openLead = useLeadModal();
 
   return (
     <section className="hero">
-      <div className="wrap hero__in">
+      <div className="hero__panel">
+        <div className="hero__stage" aria-hidden>
+          <div className="implant implant--1"><div className="implant__body" /></div>
+          <div className="implant implant--2"><div className="implant__body" /></div>
+          <div className="implant implant--3"><div className="implant__body" /></div>
+        </div>
+
         <div className="hero__copy">
           <span className="hero__eyebrow">
             <span className="dot" />
-            Медтехника и расходные материалы оптом и в розницу
+            Медкор · медтовары · оборудование
           </span>
           <h1 className="hero__title">
-            Медицинские товары <span className="hero__title-em">для клиник и дома</span>
+            Медтовары, <span className="hero__title-em">которые закрывают задачу</span>
           </h1>
-          <p className="hero__lead">
-            Сертифицированное оборудование, СИЗ, расходные материалы и средства
-            реабилитации. Поставка со склада, документы в комплекте, консультация
-            специалиста.
-          </p>
-          <div className="hero__cta">
-            <Button variant="primary" size="lg" iconRight="arrow" onClick={() => navigate("/catalog")}>
-              Открыть каталог
-            </Button>
-            <Button variant="ghost" size="lg" icon="headset" onClick={() => openLead()}>
-              Подбор и консультация
-            </Button>
-          </div>
-          <div className="hero__stats">
-            {[
-              ["1 200+", "позиций в каталоге"],
-              ["от 1 дня", "доставка по РФ"],
-              ["100%", "сертифицировано"],
-            ].map(([num, label]) => (
-              <div key={label} className="hero__stat">
-                <b>{num}</b>
-                <span>{label}</span>
-              </div>
-            ))}
-          </div>
         </div>
 
-        <div className="hero__visual">
-          <div className="hero__card hero__card--main">
-            <div className="hero__cross">
-              <svg viewBox="0 0 24 24" width={64} height={64} aria-hidden>
-                <path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z" fill="currentColor" />
-              </svg>
-            </div>
-            <div className="hero__pulse">
-              <svg viewBox="0 0 240 60" preserveAspectRatio="none" aria-hidden>
-                <path
-                  d="M0 30h60l12-22 16 44 14-32 10 20h118"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                  strokeLinejoin="round"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
+        {HERO_POINTS.map((p, i) => (
+          <div key={p[0]} className={`hero__point hero__point--${i + 1}`}>
+            <span className="hero__point-n">[ {p[0]} ]</span>
+            <b>{p[1]}</b>
+            <span>{p[2]}</span>
           </div>
-          {categories.slice(0, 4).map((c, i) => (
-            <button
-              key={c.id}
-              className={`hero__chip hero__chip--${i + 1}`}
-              data-cat={c.icon}
-              onClick={() => navigate(catalogUrl({ cat: c.slug }))}
-            >
-              <CatIcon name={c.icon} size={22} />
-              <span>{c.shortTitle}</span>
-            </button>
-          ))}
+        ))}
+
+        <div className="hero__cta">
+          <Button variant="primary" size="lg" iconRight="arrow" onClick={() => navigate("/catalog")}>
+            Открыть каталог
+          </Button>
+          <Button variant="ghost" size="sm" icon="headset" onClick={() => openLead()}>
+            Подбор и консультация
+          </Button>
         </div>
       </div>
     </section>
@@ -255,10 +225,12 @@ export default function HomePage() {
   return (
     <div className="page-home">
       <Hero />
-      <Categories />
-      <Popular />
-      <Advantages />
-      <Certificates />
+      <div className="home-reveal">
+        <Categories />
+        <Popular />
+        <Advantages />
+        <Certificates />
+      </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Button from "./Button";
 import { Icon, CatIcon } from "./Icon";
+import Button from "./Button";
 import { catalogUrl, plural } from "../lib/format";
 import { useCatalog } from "../context/CatalogContext";
 import { useLeadModal } from "../context/LeadModalContext";
@@ -15,9 +15,11 @@ export default function Header() {
   const openLead = useLeadModal();
   const { user, isAdmin, logout } = useAuth();
   const [search, setSearch] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
   const [catOpen, setCatOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const catsRef = useRef(null);
+  const searchRef = useRef(null);
 
   /* Тап мимо мегаменю закрывает его (на тач-устройствах нет mouseleave) */
   useEffect(() => {
@@ -35,10 +37,20 @@ export default function Header() {
     return () => { document.body.style.overflow = ""; };
   }, [menuOpen]);
 
+  useEffect(() => {
+    if (searchOpen && searchRef.current) searchRef.current.focus();
+  }, [searchOpen]);
+
   const submitSearch = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    const q = search.trim();
+    if (!q) {
+      setSearchOpen(true);
+      return;
+    }
+    setSearchOpen(false);
     setMenuOpen(false);
-    navigate(catalogUrl({ q: search.trim() }));
+    navigate(catalogUrl({ q }));
   };
 
   /* Десктоп: hover уже открыл меню, клик ведёт в каталог.
@@ -70,6 +82,51 @@ export default function Header() {
 
       <div className="head-main">
         <div className="wrap head-main__in">
+          {/* Левая колонка: навигация + каталог */}
+          <div className="head-main__left head-main__nav">
+            <div className="head-nav__links">
+              <Link to="/#advantages">О компании</Link>
+              <Link to="/#certificates">Сертификаты</Link>
+            </div>
+            <div
+              ref={catsRef}
+              className="head-nav__cats"
+              onMouseEnter={() => setCatOpen(true)}
+              onMouseLeave={() => setCatOpen(false)}
+            >
+              <button
+                className={"head-nav__catbtn" + (catOpen ? " is-open" : "")}
+                onClick={onCatBtn}
+              >
+                Каталог
+                <Icon name="plus" size={12} className="head-nav__plus" />
+              </button>
+              {catOpen && categories.length > 0 && (
+                <div className="megamenu">
+                  {categories.map((c) => (
+                    <Link
+                      key={c.id}
+                      className="megamenu__item"
+                      to={catalogUrl({ cat: c.slug })}
+                      onClick={() => setCatOpen(false)}
+                    >
+                      <span className="megamenu__ic" data-cat={c.icon}>
+                        <CatIcon name={c.icon} size={22} />
+                      </span>
+                      <span className="megamenu__t">
+                        <b>{c.shortTitle}</b>
+                        <small>
+                          {c.count} {plural(c.count, ["товар", "товара", "товаров"])}
+                        </small>
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Центр: логотип */}
           <Link className="brand" to="/" onClick={() => setMenuOpen(false)}>
             <span className="brand__mark">
               <svg viewBox="0 0 24 24" width={22} height={22} aria-hidden>
@@ -79,45 +136,49 @@ export default function Header() {
             <span className="brand__name">{BRAND}</span>
           </Link>
 
-          <form className="head-search" onSubmit={submitSearch}>
-            <Icon name="search" size={19} className="head-search__ic" />
-            <input
-              type="text"
-              placeholder="Поиск по каталогу: тонометр, перчатки, маски…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              aria-label="Поиск"
-            />
-            <button type="submit" className="head-search__btn">Найти</button>
-          </form>
+          {/* Правая колонка: поиск, связь, аккаунт */}
+          <div className="head-main__right">
+            <form
+              className={"head-search" + (searchOpen ? " is-open" : "")}
+              onSubmit={submitSearch}
+            >
+              <button
+                type="button"
+                className="head-search__toggle"
+                aria-label={searchOpen ? "Искать" : "Открыть поиск"}
+                onClick={() => (searchOpen ? submitSearch() : setSearchOpen(true))}
+              >
+                <Icon name="search" size={18} />
+              </button>
+              <input
+                ref={searchRef}
+                type="search"
+                value={search}
+                placeholder="Поиск по каталогу"
+                onChange={(e) => setSearch(e.target.value)}
+                onBlur={() => { if (!search.trim()) setSearchOpen(false); }}
+              />
+            </form>
 
-          <div className="head-actions">
-            <a className="head-contact" href="tel:+78001234567">
-              <span className="head-contact__ic">
-                <Icon name="headset" size={20} />
-              </span>
-              <span className="head-contact__txt">
-                <b>8 800 123-45-67</b>
-                <small>Пн–Пт 9:00–19:00</small>
-              </span>
-            </a>
-            <Button variant="primary" size="md" icon="doc" onClick={() => openLead()}>
-              Оставить заявку
-            </Button>
+            <button type="button" className="head-connect" onClick={() => openLead()}>
+              <span>Связаться</span>
+              <Icon name="arrowUpRight" size={14} />
+            </button>
+
             <Link
               className="head-icobtn"
               to={user ? (isAdmin ? "/admin" : "/") : "/login"}
               onClick={(e) => {
                 setMenuOpen(false);
-                // обычный пользователь: повторный клик — выход
                 if (user && !isAdmin) { e.preventDefault(); logout(); }
               }}
               aria-label={user ? (isAdmin ? "Админ-панель" : "Выйти") : "Войти"}
               title={user ? (isAdmin ? `Админ-панель (${user.username})` : `Выйти (${user.username})`) : "Войти"}
             >
-              <Icon name={user && !isAdmin ? "logout" : "user"} size={21} />
+              <Icon name={user && !isAdmin ? "logout" : "user"} size={20} />
               {user && <span className="head-icobtn__dot" />}
             </Link>
+
             <button
               className="head-burger"
               aria-label={menuOpen ? "Закрыть меню" : "Открыть меню"}
@@ -130,66 +191,18 @@ export default function Header() {
         </div>
       </div>
 
-      <nav className="head-nav">
-        <div className="wrap head-nav__in">
-          <div
-            ref={catsRef}
-            className="head-nav__cats"
-            onMouseEnter={() => setCatOpen(true)}
-            onMouseLeave={() => setCatOpen(false)}
-          >
-            <button
-              className={"head-nav__catbtn" + (catOpen ? " is-open" : "")}
-              onClick={onCatBtn}
-            >
-              <Icon name="grid" size={18} /> Каталог товаров
-              <Icon name="chevronDown" size={16} className="head-nav__chev" />
-            </button>
-            {catOpen && categories.length > 0 && (
-              <div className="megamenu">
-                {categories.map((c) => (
-                  <Link
-                    key={c.id}
-                    className="megamenu__item"
-                    to={catalogUrl({ cat: c.slug })}
-                    onClick={() => setCatOpen(false)}
-                  >
-                    <span className="megamenu__ic" data-cat={c.icon}>
-                      <CatIcon name={c.icon} size={22} />
-                    </span>
-                    <span className="megamenu__t">
-                      <b>{c.shortTitle}</b>
-                      <small>
-                        {c.count} {plural(c.count, ["товар", "товара", "товаров"])}
-                      </small>
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="head-nav__links">
-            <Link to={catalogUrl({ popular: true })}>Популярное</Link>
-            <Link to="/#advantages">Почему мы</Link>
-            <Link to="/#certificates">Сертификаты</Link>
-            <Link to="/#contacts">Контакты</Link>
-          </div>
-        </div>
-      </nav>
-
       {menuOpen && (
         <div className="mobile-menu">
           <form className="head-search mobile-menu__search" onSubmit={submitSearch}>
-            <Icon name="search" size={19} className="head-search__ic" />
+            <button type="button" className="head-search__toggle" onClick={submitSearch} aria-label="Искать">
+              <Icon name="search" size={18} />
+            </button>
             <input
-              type="text"
+              type="search"
               placeholder="Поиск по каталогу…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              aria-label="Поиск"
             />
-            <button type="submit" className="head-search__btn">Найти</button>
           </form>
 
           <nav className="mobile-menu__cats">
