@@ -236,7 +236,8 @@ img { max-width: 100%; display: block; }
 .prow__price-req { font-size: 14px; font-weight: 600; color: var(--accent-deep); }
 
 /* ============================================================ Шапка (стекло) */
-.site-head { position: sticky; top: 0; z-index: 40; }
+.site-head { position: sticky; top: 0; z-index: 40; transition: padding 0.3s ease; }
+.site-head.is-scrolled { padding: 14px 16px 0; }
 
 /* ── Единая верхняя плашка (нав слева · логотип в центре · действия справа) ── */
 .head-bar {
@@ -244,16 +245,18 @@ img { max-width: 100%; display: block; }
   background: color-mix(in oklab, var(--accent) 7%, rgba(255,255,255,0.45));
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid transparent;
-  transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease;
+  border: 1px solid transparent;
+  border-radius: 0;
+  transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, border-radius 0.3s ease, backdrop-filter 0.3s ease;
 }
 /* при скролле — плотнее матовое стекло + тень */
 .site-head.is-scrolled .head-bar {
   background: color-mix(in oklab, var(--accent) 9%, rgba(255,255,255,0.62));
   -webkit-backdrop-filter: blur(28px) saturate(190%);
   backdrop-filter: blur(28px) saturate(190%);
-  border-bottom-color: var(--line);
-  box-shadow: 0 10px 30px -16px rgba(13,76,94,0.32), 0 1px 0 rgba(255,255,255,0.55) inset;
+  border-color: transparent;
+  border-radius: var(--r-lg);
+  box-shadow: 0 12px 34px -18px rgba(13,76,94,0.38), 0 1px 0 rgba(255,255,255,0.55) inset;
 }
 .head-bar__in {
   display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
@@ -330,6 +333,7 @@ img { max-width: 100%; display: block; }
   .head-connect { padding: 0 15px; }
 }
 @media (max-width: 680px) {
+  .site-head.is-scrolled { padding: 10px 10px 0; }
   .head-bar__in { grid-template-columns: auto 1fr auto; height: 64px; gap: 12px; }
   .head-bar__nav { display: none; }
   .brand { justify-self: start; }
