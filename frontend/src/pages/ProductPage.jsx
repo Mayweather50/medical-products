@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import Badge from "../components/Badge";
 import Breadcrumbs from "../components/Breadcrumbs";
 import Button from "../components/Button";
-import ProductCard from "../components/ProductCard";
 import ProductImage from "../components/ProductImage";
 import { Icon } from "../components/Icon";
 import { Loading, LoadError } from "../components/StateBlock";
@@ -70,9 +69,23 @@ export default function ProductPage() {
   const meta = catMeta(p.category);
   const chars = Object.entries(p.characteristics || {});
 
+  const addToCart = () => {
+    cart.add(p, qty);
+    setAdded(true);
+    clearTimeout(addedTimer.current);
+    addedTimer.current = setTimeout(() => setAdded(false), 1200);
+  };
+
   return (
-    <div className="page-product">
-      <div className="wrap">
+    <div className="page-product cliniq">
+      <div className="wrap cliniq-nav">
+        <button
+          className="cliniq-back"
+          onClick={() => navigate(catalogUrl({ cat: p.category.slug }))}
+          aria-label="Назад в каталог"
+        >
+          <Icon name="chevron" size={18} style={{ transform: "rotate(180deg)" }} />
+        </button>
         <Breadcrumbs
           items={[
             { label: "Главная", to: "/" },
@@ -82,34 +95,55 @@ export default function ProductPage() {
         />
       </div>
 
-      <div className="wrap product-top">
-        <div className="product-gallery">
-          <ProductImage product={p} size={120} className="product-gallery__main" />
-        </div>
+      <div className="wrap">
+        <div className="cliniq-hero">
+          <div className="cliniq-hero__img">
+            <ProductImage product={p} size={130} className="cliniq-hero__pic" />
+          </div>
+          <div className="cliniq-hero__info">
+            <div className="cliniq-hero__tags">
+              {p.popular && <Badge tone="accent" icon="star">Хит продаж</Badge>}
+              {p.available ? (
+                <Badge tone="ok" icon="check">В наличии</Badge>
+              ) : (
+                <Badge tone="muted">Под заказ</Badge>
+              )}
+            </div>
+            <h1 className="cliniq-hero__title">{p.title}</h1>
+            <div className="cliniq-hero__meta">
+              <span>{p.category.title}</span>
+              <code>{p.article}</code>
+            </div>
+            <p className="cliniq-hero__desc">{p.shortDescription}</p>
 
-        <div className="product-info">
-          <div className="product-info__tags">
-            {p.popular && <Badge tone="accent" icon="star">Хит продаж</Badge>}
-            {p.available ? (
-              <Badge tone="ok" icon="check">В наличии на складе</Badge>
-            ) : (
-              <Badge tone="muted">Под заказ</Badge>
+            <div className="cliniq-actions">
+              <button className="cliniq-action" onClick={() => openLead(p)}>
+                <Icon name="phone" size={18} />
+                <span>Заказать звонок</span>
+              </button>
+            </div>
+
+            {chars.length > 0 && (
+              <div className="cliniq-chips">
+                {chars.slice(0, 4).map(([k, v]) => (
+                  <div key={k} className="cliniq-chip">
+                    <b>{v}</b>
+                    <span>{k}</span>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
-          <h1 className="product-info__title">{p.title}</h1>
-          <div className="product-info__meta">
-            <span>
-              Артикул: <code>{p.article}</code>
-            </span>
-            <span className="product-info__cat">{p.category.title}</span>
-          </div>
-          <p className="product-info__lead">{p.shortDescription}</p>
+        </div>
+      </div>
 
-          <div className="buybox">
-            <div className="buybox__price">
+      <div className="wrap">
+        <div className="cliniq-buy">
+          <div className="cliniq-buy__left">
+            <div className="cliniq-buy__price">
               {p.priceOnRequest ? (
                 <>
-                  <span className="buybox__req">Цена по запросу</span>
+                  <span className="cliniq-buy__req">Цена по запросу</span>
                   <small>Стоимость зависит от комплектации и объёма</small>
                 </>
               ) : (
@@ -120,109 +154,125 @@ export default function ProductPage() {
                 </>
               )}
             </div>
-            <div className="buybox__actions">
-              {p.priceOnRequest ? (
-                <Button variant="primary" size="lg" icon="headset" onClick={() => openLead(p)}>
-                  Запросить цену
-                </Button>
-              ) : (
-                <>
-                  <div className="qty qty--lg">
-                    <button onClick={() => setQty(Math.max(1, qty - 1))} aria-label="Меньше">
-                      <Icon name="minus" size={16} />
-                    </button>
-                    <span>{qty}</span>
-                    <button onClick={() => setQty(qty + 1)} aria-label="Больше">
-                      <Icon name="plus" size={16} />
-                    </button>
-                  </div>
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    icon={added ? "check" : "cart"}
-                    onClick={() => {
-                      cart.add(p, qty);
-                      setAdded(true);
-                      clearTimeout(addedTimer.current);
-                      addedTimer.current = setTimeout(() => setAdded(false), 1200);
-                    }}
-                  >
-                    {added ? "Добавлено" : "В корзину"}
-                  </Button>
-                </>
-              )}
-              <Button variant="outline" size="lg" icon="phone" onClick={() => openLead(p)}>
-                Заказать звонок
-              </Button>
-            </div>
-            <ul className="buybox__perks">
+            <ul className="cliniq-buy__perks">
               <li>
-                <Icon name="truck" size={17} /> Доставка по РФ от 1 дня
+                <span className="cliniq-perk-ic"><Icon name="truck" size={16} /></span>
+                Доставка по РФ от 1 дня
               </li>
               <li>
-                <Icon name="shield" size={17} /> Сертификат и документы в комплекте
+                <span className="cliniq-perk-ic"><Icon name="shield" size={16} /></span>
+                Сертификат и документы в комплекте
               </li>
               <li>
-                <Icon name="box" size={17} /> Опт и розница, спеццены для клиник
+                <span className="cliniq-perk-ic"><Icon name="box" size={16} /></span>
+                Опт и розница, спеццены для клиник
               </li>
             </ul>
           </div>
+
+          <div className="cliniq-buy__right">
+            {p.priceOnRequest ? (
+              <Button
+                variant="primary"
+                size="lg"
+                icon="headset"
+                className="cliniq-buy__cta"
+                onClick={() => openLead(p)}
+              >
+                Запросить цену
+              </Button>
+            ) : (
+              <>
+                <div className="qty qty--lg">
+                  <button onClick={() => setQty(Math.max(1, qty - 1))} aria-label="Меньше">
+                    <Icon name="minus" size={16} />
+                  </button>
+                  <span>{qty}</span>
+                  <button onClick={() => setQty(qty + 1)} aria-label="Больше">
+                    <Icon name="plus" size={16} />
+                  </button>
+                </div>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  icon={added ? "check" : "cart"}
+                  className="cliniq-buy__cta"
+                  onClick={addToCart}
+                >
+                  {added ? "Добавлено в корзину" : "В корзину"}
+                </Button>
+              </>
+            )}
+            <Button
+              variant="outline"
+              size="md"
+              icon="phone"
+              className="cliniq-buy__cta2"
+              onClick={() => openLead(p)}
+            >
+              Заказать звонок
+            </Button>
+          </div>
         </div>
       </div>
 
-      <div className="wrap product-detail">
-        <div className="product-detail__main">
-          <section className="panel">
-            <h2 className="panel__title">Описание</h2>
-            <p className="panel__text">{p.description}</p>
+      <div className="wrap cliniq-details">
+        <section className="cliniq-panel">
+          <h2>Описание</h2>
+          <p>{p.description}</p>
+        </section>
+        {chars.length > 0 && (
+          <section className="cliniq-panel">
+            <h2>Характеристики</h2>
+            <table className="spec">
+              <tbody>
+                {chars.map(([key, value]) => (
+                  <tr key={key}>
+                    <th>{key}</th>
+                    <td>{value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </section>
-          {chars.length > 0 && (
-            <section className="panel">
-              <h2 className="panel__title">Характеристики</h2>
-              <table className="spec">
-                <tbody>
-                  {chars.map(([key, value]) => (
-                    <tr key={key}>
-                      <th>{key}</th>
-                      <td>
-                        <span className="spec__dots" />
-                        {value}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </section>
-          )}
-        </div>
-
-        <aside className="product-detail__aside">
-          <div className="helpbox">
-            <span className="helpbox__ic">
-              <Icon name="headset" size={24} />
-            </span>
-            <h3>Поможем с выбором</h3>
-            <p>Подберём аналоги, рассчитаем оптовую цену и сроки поставки.</p>
-            <Button variant="primary" size="md" className="helpbox__btn" onClick={() => openLead(p)}>
-              Получить консультацию
-            </Button>
-            <a className="helpbox__phone" href="tel:+78001234567">
-              <Icon name="phone" size={16} /> 8 800 123-45-67
-            </a>
-          </div>
-        </aside>
+        )}
       </div>
 
       {related.length > 0 && (
-        <section className="section section--soft">
+        <section className="section">
           <div className="wrap">
             <div className="section__head">
               <h2 className="section__title">Похожие товары</h2>
             </div>
-            <div className="prod-grid">
-              {related.map((r) => (
-                <ProductCard key={r.id} product={r} />
-              ))}
+            <div className="cliniq-related">
+              {related.map((r) => {
+                const rm = catMeta(r.category);
+                return (
+                  <button
+                    key={r.id}
+                    className="cliniq-rcard"
+                    onClick={() => navigate(`/product/${r.slug}`)}
+                  >
+                    <div className="cliniq-rcard__top">
+                      <span className="cliniq-rcard__cat">{rm.shortTitle}</span>
+                      <h3>{r.title}</h3>
+                    </div>
+                    <div className="cliniq-rcard__bot">
+                      {r.priceOnRequest ? (
+                        <span className="cliniq-rcard__price">По запросу</span>
+                      ) : (
+                        <>
+                          <b>{fmtPrice(r.price)}</b>
+                          <span> / шт.</span>
+                        </>
+                      )}
+                      <span className="cliniq-rcard__arr">
+                        <Icon name="arrowSm" size={18} />
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </section>

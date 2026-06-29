@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import ProductCard from "../components/ProductCard";
@@ -9,81 +9,105 @@ import { catalogUrl, plural } from "../lib/format";
 import { useCatalog } from "../context/CatalogContext";
 import { useLeadModal } from "../context/LeadModalContext";
 
+const SLIDES = [
+  {
+    id: "banner-1",
+    tone: "teal",
+    eyebrow: "Каталог",
+    title: "Медицинское оборудование и расходные материалы",
+    cta: "Открыть каталог",
+    to: "/catalog",
+  },
+  {
+    id: "banner-2",
+    tone: "azure",
+    eyebrow: "В наличии",
+    title: "Расходные материалы для клиник и больниц",
+    cta: "Смотреть товары",
+    to: catalogUrl({ cat: "rashodnye-materialy" }),
+  },
+  {
+    id: "banner-3",
+    tone: "deep",
+    eyebrow: "Сервис",
+    title: "Оснащение кабинета под ключ за 14 дней",
+    cta: "Популярные товары",
+    to: catalogUrl({ popular: true }),
+  },
+];
+
 function Hero() {
   const navigate = useNavigate();
-  const { categories } = useCatalog();
-  const openLead = useLeadModal();
+  const [active, setActive] = useState(0);
+  const timer = useRef(null);
+
+  const go = (i) => setActive((i + SLIDES.length) % SLIDES.length);
+
+  /* Автолистание с паузой при наведении */
+  const start = () => {
+    stop();
+    timer.current = setInterval(() => setActive((a) => (a + 1) % SLIDES.length), 6000);
+  };
+  const stop = () => { if (timer.current) clearInterval(timer.current); };
+  useEffect(() => { start(); return stop; }, []);
 
   return (
-    <section className="hero">
-      <div className="wrap hero__in">
-        <div className="hero__copy">
-          <span className="hero__eyebrow">
-            <span className="dot" />
-            Медтехника и расходные материалы оптом и в розницу
-          </span>
-          <h1 className="hero__title">
-            Медицинские товары <span className="hero__title-em">для клиник и дома</span>
-          </h1>
-          <p className="hero__lead">
-            Сертифицированное оборудование, СИЗ, расходные материалы и средства
-            реабилитации. Поставка со склада, документы в комплекте, консультация
-            специалиста.
-          </p>
-          <div className="hero__cta">
-            <Button variant="primary" size="lg" iconRight="arrow" onClick={() => navigate("/catalog")}>
-              Открыть каталог
-            </Button>
-            <Button variant="ghost" size="lg" icon="headset" onClick={() => openLead()}>
-              Подбор и консультация
-            </Button>
-          </div>
-          <div className="hero__stats">
-            {[
-              ["1 200+", "позиций в каталоге"],
-              ["от 1 дня", "доставка по РФ"],
-              ["100%", "сертифицировано"],
-            ].map(([num, label]) => (
-              <div key={label} className="hero__stat">
-                <b>{num}</b>
-                <span>{label}</span>
+    <section
+      className="mc-banner"
+      onMouseEnter={stop}
+      onMouseLeave={start}
+      aria-label="Баннер"
+    >
+      <div className="mc-banner__track">
+        {SLIDES.map((s, i) => (
+          <div
+            key={s.id}
+            className={`mc-banner__slide mc-banner__slide--${s.tone}`}
+            style={{ opacity: i === active ? 1 : 0, transition: "opacity 0.8s ease" }}
+            aria-hidden={i !== active}
+          >
+            <div className="mc-banner__scrim" aria-hidden />
+            <div className="mc-banner__copy">
+              <span className="mc-banner__eyebrow">{s.eyebrow}</span>
+              <h1 className="mc-banner__title">{s.title}</h1>
+              <div className="mc-banner__cta">
+                <Button variant="primary" size="lg" iconRight="arrow" onClick={() => navigate(s.to)}>
+                  {s.cta}
+                </Button>
               </div>
-            ))}
+            </div>
           </div>
-        </div>
+        ))}
+      </div>
 
-        <div className="hero__visual">
-          <div className="hero__card hero__card--main">
-            <div className="hero__cross">
-              <svg viewBox="0 0 24 24" width={64} height={64} aria-hidden>
-                <path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z" fill="currentColor" />
-              </svg>
-            </div>
-            <div className="hero__pulse">
-              <svg viewBox="0 0 240 60" preserveAspectRatio="none" aria-hidden>
-                <path
-                  d="M0 30h60l12-22 16 44 14-32 10 20h118"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                  strokeLinejoin="round"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
-          </div>
-          {categories.slice(0, 4).map((c, i) => (
-            <button
-              key={c.id}
-              className={`hero__chip hero__chip--${i + 1}`}
-              data-cat={c.icon}
-              onClick={() => navigate(catalogUrl({ cat: c.slug }))}
-            >
-              <CatIcon name={c.icon} size={22} />
-              <span>{c.shortTitle}</span>
-            </button>
-          ))}
-        </div>
+      <button
+        className="mc-banner__arrow mc-banner__arrow--prev"
+        type="button"
+        aria-label="Предыдущий слайд"
+        onClick={() => go(active - 1)}
+      >
+        <Icon name="arrow" size={22} />
+      </button>
+      <button
+        className="mc-banner__arrow mc-banner__arrow--next"
+        type="button"
+        aria-label="Следующий слайд"
+        onClick={() => go(active + 1)}
+      >
+        <Icon name="arrow" size={22} />
+      </button>
+
+      <div className="mc-banner__dots" role="tablist">
+        {SLIDES.map((s, i) => (
+          <button
+            key={s.id}
+            type="button"
+            className={"mc-banner__dot" + (i === active ? " is-active" : "")}
+            aria-label={`Слайд ${i + 1}`}
+            aria-selected={i === active}
+            onClick={() => go(i)}
+          />
+        ))}
       </div>
     </section>
   );
@@ -255,10 +279,12 @@ export default function HomePage() {
   return (
     <div className="page-home">
       <Hero />
-      <Categories />
-      <Popular />
-      <Advantages />
-      <Certificates />
+      <div className="home-reveal">
+        <Categories />
+        <Popular />
+        <Advantages />
+        <Certificates />
+      </div>
     </div>
   );
 }
