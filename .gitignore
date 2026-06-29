@@ -22,3 +22,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Docker image archives (для переноса на VPS)
+*.tar

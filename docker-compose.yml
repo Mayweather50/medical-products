@@ -19,6 +19,7 @@ services:
 
   backend:
     build: .
+    image: medical-products-backend:latest
     container_name: medical-products-backend
     depends_on:
       postgres:
@@ -40,6 +41,7 @@ services:
 
   frontend:
     build: ./frontend
+    image: medical-products-frontend:latest
     container_name: medical-products-frontend
     depends_on:
       - backend
