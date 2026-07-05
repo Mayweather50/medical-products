@@ -1034,7 +1034,7 @@ body {
   width: min(1480px, calc(100% - 48px)); margin: 22px auto 0;
   height: clamp(380px, 56vh, 580px);
   border-radius: 28px; overflow: hidden; isolation: isolate;
-  background: #06131a; box-shadow: var(--sh-lg, 0 30px 60px -30px rgba(20,24,28,0.4));
+  background: #12768d; box-shadow: var(--sh-lg, 0 30px 60px -30px rgba(20,24,28,0.4));
 }
 
 /* — слайды стопкой, видим активный (управляет motion.js) — */
@@ -1043,9 +1043,9 @@ body {
   position: absolute; inset: 0; opacity: 0; will-change: opacity;
 }
 .mc-banner__slide:first-child { opacity: 1; }
-.mc-banner__slide--teal  { background: linear-gradient(120deg, #0b2c3a, #103040 60%, #06131a); }
-.mc-banner__slide--azure { background: linear-gradient(120deg, #14384a, #2c6e8f 60%, #0b2630); }
-.mc-banner__slide--deep  { background: linear-gradient(120deg, #0a1f2a, #16424f 55%, #07151a); }
+.mc-banner__slide--teal  { background: linear-gradient(120deg, #1b7f99, #2ba7bd 58%, #167f97); }
+.mc-banner__slide--azure { background: linear-gradient(120deg, #2493b8, #47c2d6 58%, #1c8dab); }
+.mc-banner__slide--deep  { background: linear-gradient(120deg, #158497, #2bb8ad 55%, #12909a); }
 
 /* фото-слот заполняет слайд */
 .mc-banner__img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
@@ -1054,8 +1054,8 @@ body {
 .mc-banner__scrim {
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
   background:
-    linear-gradient(90deg, rgba(6,16,21,0.82) 0%, rgba(6,16,21,0.5) 42%, rgba(6,16,21,0.08) 70%, transparent 100%),
-    linear-gradient(0deg, rgba(6,16,21,0.42), transparent 46%);
+    linear-gradient(90deg, rgba(8,42,54,0.6) 0%, rgba(8,42,54,0.34) 42%, rgba(8,42,54,0.06) 70%, transparent 100%),
+    linear-gradient(0deg, rgba(8,42,54,0.32), transparent 46%);
 }
 
 /* — текстовый блок слайда — */
