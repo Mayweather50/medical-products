@@ -1,4 +1,4 @@
-# Medical Products — Медкор
+# Medical Products — Ugodent
 
 Полноценный проект интернет-витрины компании, продающей медицинские товары, расходные материалы и оборудование: REST API backend на Spring Boot и SPA-frontend на React.
 

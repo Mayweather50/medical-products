@@ -5,7 +5,7 @@ import { catalogUrl } from "../lib/format";
 import { useCatalog } from "../context/CatalogContext";
 import { useLeadModal } from "../context/LeadModalContext";
 
-const BRAND = "Медкор";
+const BRAND = "Ugodent";
 
 export default function Footer() {
   const { categories } = useCatalog();
@@ -29,11 +29,6 @@ export default function Footer() {
       <div className="wrap site-foot__grid">
         <div className="site-foot__brandcol">
           <div className="brand brand--foot">
-            <span className="brand__mark">
-              <svg viewBox="0 0 24 24" width={20} height={20} aria-hidden>
-                <path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z" fill="currentColor" />
-              </svg>
-            </span>
             <span className="brand__name">{BRAND}</span>
           </div>
           <p>
@@ -44,8 +39,8 @@ export default function Footer() {
             <a href="tel:+78001234567">
               <Icon name="phone" size={16} /> 8 800 123-45-67
             </a>
-            <a href="mailto:zakaz@medkor.ru">
-              <Icon name="mail" size={16} /> zakaz@medkor.ru
+            <a href="mailto:zakaz@ugodent.ru">
+              <Icon name="mail" size={16} /> zakaz@ugodent.ru
             </a>
             <span>
               <Icon name="pin" size={16} /> Москва, ул. Медицинская, 12

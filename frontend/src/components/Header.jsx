@@ -8,17 +8,7 @@ import { useLeadModal } from "../context/LeadModalContext";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 
-const BRAND = "Медкор";
-
-function BrandMark() {
-  return (
-    <span className="brand__mark">
-      <svg viewBox="0 0 24 24" width={20} height={20} aria-hidden>
-        <path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z" fill="currentColor" />
-      </svg>
-    </span>
-  );
-}
+const BRAND = "Ugodent";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -138,7 +128,6 @@ export default function Header() {
 
           {/* Центр: логотип */}
           <Link className="brand" to="/" onClick={() => setMenuOpen(false)}>
-            <BrandMark />
             <span className="brand__name">{BRAND}</span>
           </Link>
 
