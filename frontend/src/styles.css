@@ -1399,52 +1399,61 @@ body {
    секцию сертификатов. Бирюзовый баннер сохранён.
    ============================================================ */
 :root {
-  --pearl: #f3f7f8;
-  --pearl-2: #eaf1f2;
-  --paper: #f5f9fa;
+  --pearl: #ffffff;
+  --pearl-2: #f5f8f9;
+  --paper: #ffffff;
+  --niagara: #5b7b95;          /* Pantone 17-4123 Niagara — цвет подвала */
+  --niagara-line: rgba(255,255,255,0.18);
 }
 
+/* Максимум белого: тело чисто белое, без тонировки */
 body {
-  background: #f5f9fa;
-  background-image:
-    radial-gradient(1100px 620px at 84% -12%, rgba(37,169,201,0.06) 0%, transparent 60%),
-    radial-gradient(1000px 600px at -6% 2%, rgba(37,169,201,0.04) 0%, transparent 56%);
-  background-attachment: fixed;
+  background: #ffffff;
+  background-image: none;
 }
 
-/* Стеклянные поверхности → чистый белый (без бирюзового тинта) */
+/* Стеклянные поверхности → чистый белый */
 .card, .prow, .cat-card, .filter-group,
 .cliniq-panel, .cliniq-rcard, .cliniq-chip, .cliniq-buy {
   background: #ffffff;
 }
 
-/* Тонированные секции → почти белые */
+/* Тонированные секции → белые, разделены тонкой линией */
 .section--soft {
-  background: #f8fbfb;
+  background: #ffffff;
   border-block: 1px solid var(--line);
 }
 
-/* — Футер: из тёмного в светлый — */
-.site-foot { background: #eef4f5; color: var(--graphite); border-top: 1px solid var(--line); }
-.site-foot__cta { border-bottom: 1px solid var(--line); }
-.site-foot__cta h2 { color: var(--ink); }
-.site-foot__cta p,
-.site-foot__brandcol p { color: var(--graphite); }
-.brand--foot .brand__name { color: var(--ink); }
-.site-foot__contacts a, .site-foot__contacts span { color: var(--graphite); }
-.site-foot__contacts a:hover { color: var(--accent); }
-.site-foot__col h4 { color: var(--ink); }
-.site-foot__col a { color: var(--graphite); }
-.site-foot__col a:hover { color: var(--accent); }
-.site-foot__bottom { border-top: 1px solid var(--line); }
-.site-foot__bottom-in { color: var(--steel); }
-
-/* — Секция «Сертификаты»: из тёмной в светлую — */
+/* — Секция «Сертификаты»: из тёмной в белую — */
 .section--ink,
-.home-reveal .section--ink { background: #eef4f5; color: var(--graphite); }
+.home-reveal .section--ink { background: #ffffff; color: var(--graphite); }
 .section--ink .section__title { color: var(--ink); }
 .section__head--inverse .section__sub { color: var(--graphite); }
 .cert-shield { color: var(--accent); background: var(--accent-pale); border: 1px solid var(--accent-soft); }
 .cert-card { background: #ffffff; border: 1px solid var(--line); box-shadow: var(--sh-sm); }
 .cert-card__b b { color: var(--ink); }
 .cert-card__b small { color: var(--graphite); }
+
+/* — Подвал: цвет «Ниагара», белый текст — */
+.site-foot { background: var(--niagara); color: rgba(255,255,255,0.85); border-top: none; }
+.site-foot__cta { border-bottom: 1px solid var(--niagara-line); }
+.site-foot__cta h2 { color: #ffffff; }
+.site-foot__cta p,
+.site-foot__brandcol p { color: rgba(255,255,255,0.82); }
+.brand--foot .brand__name { color: #ffffff; }
+.site-foot__contacts a, .site-foot__contacts span { color: rgba(255,255,255,0.88); }
+.site-foot__contacts a:hover { color: #ffffff; }
+.site-foot__col h4 { color: #ffffff; }
+.site-foot__col a { color: rgba(255,255,255,0.80); }
+.site-foot__col a:hover { color: #ffffff; }
+.site-foot__bottom { border-top: 1px solid var(--niagara-line); }
+.site-foot__bottom-in { color: rgba(255,255,255,0.70); }
+.site-foot__note { color: rgba(255,255,255,0.62); }
+
+/* — Иконки категорий: цвет несёт сама иконка (duotone), подложка чистая — */
+.cat-card__ic, .megamenu__ic, .filter-cats__ic {
+  background: #ffffff;
+  color: inherit;
+  border: 1px solid var(--line);
+  box-shadow: var(--sh-sm);
+}

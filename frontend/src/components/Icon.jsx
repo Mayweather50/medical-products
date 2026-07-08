@@ -83,10 +83,31 @@ function renderShapes(defs) {
   });
 }
 
+// Цвет категории — каждая иконка своим тоном (как в референсе).
+const CAT_COLORS = {
+  consumables: "#0e9aa0",   // расходники — бирюза
+  ppe: "#3b82c4",           // СИЗ — синий
+  diagnostics: "#6366d6",   // диагностика — индиго
+  rehab: "#e08a3c",         // реабилитация — янтарь
+  care: "#e05a6e",          // уход — коралл
+  disinfection: "#17b0c4",  // дезинфекция — циан
+  furniture: "#2fa980",     // мебель — зелёный
+  clinic: "#5b7b95",        // для клиник — ниагара
+};
+
 export function Icon({ name, ...rest }) {
   return <Svg {...rest}>{renderShapes(PATHS[name] || PATHS.box)}</Svg>;
 }
 
-export function CatIcon({ name, ...rest }) {
-  return <Svg stroke={1.5} {...rest}>{renderShapes(CAT_PATHS[name] || CAT_PATHS.clinic)}</Svg>;
+// Иконка категории в стиле референса: мягкая цветная плитка + чёткий
+// глиф того же цвета (duotone). Цвет берётся из CAT_COLORS.
+export function CatIcon({ name, style, ...rest }) {
+  const color = CAT_COLORS[name] || CAT_COLORS.clinic;
+  return (
+    <Svg stroke={1.6} style={{ color, ...style }} {...rest}>
+      <rect x="2" y="2" width="20" height="20" rx="6.5"
+            fill={color} fillOpacity="0.14" stroke="none" />
+      {renderShapes(CAT_PATHS[name] || CAT_PATHS.clinic)}
+    </Svg>
+  );
 }
