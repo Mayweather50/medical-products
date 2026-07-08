@@ -43,7 +43,7 @@ export default function Footer() {
               <Icon name="mail" size={16} /> zakaz@ugodent.ru
             </a>
             <span>
-              <Icon name="pin" size={16} /> Москва, ул. Медицинская, 12
+              <Icon name="pin" size={16} /> Махачкала, пр. Имама Шамиля, 48
             </span>
           </div>
         </div>
