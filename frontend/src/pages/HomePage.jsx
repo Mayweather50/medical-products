@@ -136,7 +136,7 @@ function Categories() {
           {categories.map((c) => (
             <Link key={c.id} className="cat-card" data-cat={c.icon} to={catalogUrl({ cat: c.slug })}>
               <span className="cat-card__ic">
-                <CatIcon name={c.icon} size={30} />
+                <CatIcon name={c.icon} size={40} />
               </span>
               <span className="cat-card__body">
                 <b>{c.shortTitle}</b>

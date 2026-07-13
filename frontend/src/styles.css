@@ -1450,10 +1450,11 @@ body {
 .site-foot__bottom-in { color: rgba(255,255,255,0.70); }
 .site-foot__note { color: rgba(255,255,255,0.62); }
 
-/* — Иконки категорий: цвет несёт сама иконка (duotone), подложка чистая — */
+/* — Иконки категорий: без коробки, как в референсе (navy + бирюзовый акцент) — */
 .cat-card__ic, .megamenu__ic, .filter-cats__ic {
-  background: #ffffff;
+  background: transparent;
   color: inherit;
-  border: 1px solid var(--line);
-  box-shadow: var(--sh-sm);
+  border: none;
+  box-shadow: none;
 }
+.filter-cats button.is-active .filter-cats__ic { background: transparent; }

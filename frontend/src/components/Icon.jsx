@@ -53,23 +53,57 @@ const PATHS = {
   trash: ["path:M4 7h16", "path:M10 11v6", "path:M14 11v6", "path:M5 7l1 12a2 2 0 002 2h8a2 2 0 002-2l1-12", "path:M9 7V4h6v3"],
 };
 
-const CAT_PATHS = {
-  // расходные материалы — шприц
-  consumables: ["path:M14 4l6 6", "path:M16.5 6.5l-9 9-3.5.9.9-3.5 9-9z", "path:M11 10l3 3", "path:M5 19l-1.5 1.5"],
-  // СИЗ — маска
-  ppe: ["path:M4 9c2-1 4-1.5 8-1.5S18 8 20 9c0 5-3.5 8-8 8s-8-3-8-8z", "path:M4 11h-1.5", "path:M20 11h1.5", "path:M9 11.5h6", "path:M9.5 14h5"],
-  // диагностика — стетоскоп
-  diagnostics: ["path:M6 3v5a4 4 0 008 0V3", "path:M6 3h-1", "path:M14 3h1", "path:M10 16v1a4 4 0 008 0v-1", "circle:18 13 2"],
-  // реабилитация — костыль
-  rehab: ["path:M9 3h4", "path:M11 3v10", "path:M11 13l-3 8", "path:M11 13l3 8", "circle:11 16 0.6"],
-  // уход — сердце
-  care: ["path:M12 21s-6-4-6-9a3.2 3.2 0 016-1.4A3.2 3.2 0 0118 12c0 5-6 9-6 9z"],
-  // дезинфекция — капля
-  disinfection: ["path:M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z", "path:M9.5 13.5a2.6 2.6 0 002.5 2.5"],
-  // мебель — кушетка
-  furniture: ["path:M3 11h14a3 3 0 013 3v3", "path:M3 8v9", "path:M3 14h17", "path:M21 17v2", "path:M3 17v2", "rect:3 9 5 2.5 1"],
-  // для клиник — корпус с крестом
-  clinic: ["path:M4 21V6l8-3 8 3v15", "path:M4 21h16", "path:M12 8.5v4", "path:M10 10.5h4", "path:M9 21v-3h6v3"],
+// Иконки категорий в стиле референса: тёмно-синий контур (base) + один
+// бирюзовый акцент на детали (accent). Каждая — свой предмет.
+const CAT_ICONS = {
+  // расходные материалы — шприц (горизонтальный)
+  consumables: {
+    base: ["path:M3 12h3", "path:M6 10v4", "rect:6 9.5 8 5 1.2", "path:M14 12h3.5", "path:M17.5 9.5v5"],
+    accent: ["path:M8 12h3.5"],
+  },
+  // СИЗ — медицинская маска с петлями
+  ppe: {
+    base: [
+      "path:M5 9c4-1.4 10-1.4 14 0v5c0 1-.8 1.8-2 2.1-3 .8-7 .8-10 0-1.2-.3-2-1.1-2-2.1z",
+      "path:M5 10l-2 1v3l2 1",
+      "path:M19 10l2 1v3l-2 1",
+    ],
+    accent: ["path:M8.5 11.5h7", "path:M8.5 14h7"],
+  },
+  // диагностика — монитор с пульсом
+  diagnostics: {
+    base: ["rect:3 5 18 11 2", "path:M9 20h6", "path:M12 16v4"],
+    accent: ["path:M6 11h2.5l1.3-3 2 6 1.4-3H18"],
+  },
+  // реабилитация — инвалидная коляска
+  rehab: {
+    base: ["circle:10 16.5 4", "circle:13 6 1.3", "path:M11 9.2h2.8l1.3 3.8H18", "path:M11 9.2l-.6-2.2"],
+    accent: ["path:M16 13l1.6 3.5", "circle:10 16.5 0.5"],
+  },
+  // уход — сердце в ладонях (заботливая поддержка)
+  care: {
+    base: ["path:M4.5 13c2 3.2 4.8 4.9 7.5 4.9s5.5-1.7 7.5-4.9"],
+    accent: ["path:M12 11.4s-3.1-2-3.1-4.1A1.6 1.6 0 0112 5.7 1.6 1.6 0 0115.1 7.3c0 2.1-3.1 4.1-3.1 4.1z"],
+  },
+  // дезинфекция — распылитель
+  disinfection: {
+    base: [
+      "path:M9 21a1.2 1.2 0 01-1.2-1.2v-6.3A1.5 1.5 0 019.3 12h3.4a1.5 1.5 0 011.5 1.5v6.3A1.2 1.2 0 0113 21z",
+      "path:M10 12V9.2h3",
+      "rect:9.2 6.6 3.2 2 0.5",
+    ],
+    accent: ["path:M14.5 7h2.2", "path:M14.5 9h2.6", "path:M15 11h2"],
+  },
+  // мебель — офисное кресло
+  furniture: {
+    base: ["path:M8 4h6a1 1 0 011 1v5H7V5a1 1 0 011-1z", "rect:5.5 10 13 2 1", "path:M12 12v4", "path:M8 20l4-4 4 4"],
+    accent: ["path:M9 20h6"],
+  },
+  // для клиник — аптечка с крестом
+  clinic: {
+    base: ["rect:3 7 18 12 2.5", "path:M8.5 7V5.2A1.2 1.2 0 019.7 4h4.6A1.2 1.2 0 0115.5 5.2V7"],
+    accent: ["path:M12 10.8v4.4", "path:M9.8 13h4.4"],
+  },
 };
 
 function renderShapes(defs) {
@@ -83,31 +117,30 @@ function renderShapes(defs) {
   });
 }
 
-// Цвет категории — каждая иконка своим тоном (как в референсе).
+// У каждой категории свой цвет (двухтональный: основной + тёмный акцент того же тона).
 const CAT_COLORS = {
-  consumables: "#0e9aa0",   // расходники — бирюза
-  ppe: "#3b82c4",           // СИЗ — синий
-  diagnostics: "#6366d6",   // диагностика — индиго
-  rehab: "#e08a3c",         // реабилитация — янтарь
-  care: "#e05a6e",          // уход — коралл
-  disinfection: "#17b0c4",  // дезинфекция — циан
-  furniture: "#2fa980",     // мебель — зелёный
-  clinic: "#5b7b95",        // для клиник — ниагара
+  consumables:  ["#0ea5a5", "#0b7d7d"], // расходники — бирюза
+  ppe:          ["#3b74d6", "#274f9c"], // СИЗ — синий
+  diagnostics:  ["#6d5ce0", "#4a3caa"], // диагностика — индиго
+  rehab:        ["#e0862f", "#b3651c"], // реабилитация — янтарь
+  care:         ["#e05a8a", "#b23a68"], // уход — розовый
+  disinfection: ["#14b8c4", "#0e8a93"], // дезинфекция — циан
+  furniture:    ["#2fa46b", "#1f7a4d"], // мебель — зелёный
+  clinic:       ["#5b7b95", "#3f5a70"], // для клиник — ниагара
 };
 
 export function Icon({ name, ...rest }) {
   return <Svg {...rest}>{renderShapes(PATHS[name] || PATHS.box)}</Svg>;
 }
 
-// Иконка категории в стиле референса: мягкая цветная плитка + чёткий
-// глиф того же цвета (duotone). Цвет берётся из CAT_COLORS.
+// Иконка категории: цветной глиф + акцент-деталь тёмным тоном того же цвета.
 export function CatIcon({ name, style, ...rest }) {
-  const color = CAT_COLORS[name] || CAT_COLORS.clinic;
+  const g = CAT_ICONS[name] || CAT_ICONS.clinic;
+  const [main, accent] = CAT_COLORS[name] || CAT_COLORS.clinic;
   return (
-    <Svg stroke={1.6} style={{ color, ...style }} {...rest}>
-      <rect x="2" y="2" width="20" height="20" rx="6.5"
-            fill={color} fillOpacity="0.14" stroke="none" />
-      {renderShapes(CAT_PATHS[name] || CAT_PATHS.clinic)}
+    <Svg stroke={1.8} style={style} {...rest}>
+      <g stroke={main}>{renderShapes(g.base)}</g>
+      {g.accent && <g stroke={accent}>{renderShapes(g.accent)}</g>}
     </Svg>
   );
 }

@@ -181,7 +181,7 @@ export default function CatalogPage() {
                     onClick={() => updateParams({ cat: c.slug })}
                   >
                     <span className="filter-cats__ic" data-cat={c.icon}>
-                      <CatIcon name={c.icon} size={17} />
+                      <CatIcon name={c.icon} size={21} />
                     </span>
                     <span className="filter-cats__t">{c.shortTitle}</span>
                     <span className="filter-cats__n">{c.count}</span>

@@ -111,7 +111,7 @@ export default function Header() {
                       onClick={() => setCatOpen(false)}
                     >
                       <span className="megamenu__ic" data-cat={c.icon}>
-                        <CatIcon name={c.icon} size={22} />
+                        <CatIcon name={c.icon} size={28} />
                       </span>
                       <span className="megamenu__t">
                         <b>{c.shortTitle}</b>
@@ -234,7 +234,7 @@ export default function Header() {
                 onClick={() => setMenuOpen(false)}
               >
                 <span className="megamenu__ic" data-cat={c.icon}>
-                  <CatIcon name={c.icon} size={20} />
+                  <CatIcon name={c.icon} size={26} />
                 </span>
                 <span>{c.shortTitle}</span>
               </Link>
