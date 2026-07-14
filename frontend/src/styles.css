@@ -1459,6 +1459,27 @@ body {
 }
 .filter-cats button.is-active .filter-cats__ic { background: transparent; }
 
+/* — Карусель «Популярные товары» со стрелками — */
+.pop-actions { display: flex; align-items: center; gap: 14px; }
+.pop-nav { display: flex; gap: 8px; }
+.pop-nav__btn {
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid var(--line); background: #fff; color: var(--ink);
+  display: grid; place-items: center; cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+}
+.pop-nav__btn:hover { background: var(--accent); color: #fff; border-color: transparent; }
+.pop-nav__btn:active { transform: scale(0.94); }
+.pop-track {
+  display: flex; gap: 18px; overflow-x: auto;
+  scroll-snap-type: x mandatory; padding: 4px 2px 12px;
+  scrollbar-width: none;
+}
+.pop-track::-webkit-scrollbar { display: none; }
+.pop-slide { flex: 0 0 calc((100% - 3 * 18px) / 4); scroll-snap-align: start; }
+@media (max-width: 900px) { .pop-slide { flex-basis: calc((100% - 18px) / 2); } }
+@media (max-width: 560px) { .pop-slide { flex-basis: 80%; } }
+
 /* — Карточки-сертификаты в стиле блока преимуществ — */
 .adv-card--link { text-decoration: none; color: inherit; display: block; transition: transform 0.15s ease; }
 .adv-card--link:hover { transform: translateY(-2px); }

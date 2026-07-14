@@ -32,10 +32,10 @@ const SLIDES = [
     id: "banner-3",
     tone: "azure",
     img: "/banners/banner-3.jpg",
-    eyebrow: "Оснащение",
-    title: "Реанимация и анестезиология под ключ",
-    cta: "Смотреть раздел",
-    to: catalogUrl({ cat: "reanimatsiya-i-anesteziologiya" }),
+    eyebrow: "Под ключ",
+    title: "Оснащение стоматологического кабинета",
+    cta: "Смотреть оборудование",
+    to: catalogUrl({ cat: "stomatologicheskoe-oborudovanie" }),
   },
 ];
 
@@ -162,15 +162,24 @@ function Categories() {
 function Popular() {
   const navigate = useNavigate();
   const [state, setState] = useState({ items: [], loading: true, error: null });
+  const trackRef = useRef(null);
 
   const load = () => {
     setState((s) => ({ ...s, loading: true, error: null }));
     api
       .getPopular()
-      .then((items) => setState({ items: items.slice(0, 4), loading: false, error: null }))
+      .then((items) => setState({ items, loading: false, error: null }))
       .catch((error) => setState({ items: [], loading: false, error }));
   };
   useEffect(load, []);
+
+  const scroll = (dir) => {
+    const el = trackRef.current;
+    if (!el) return;
+    const card = el.querySelector(".pop-slide");
+    const step = card ? card.offsetWidth + 18 : el.clientWidth * 0.8;
+    el.scrollBy({ left: dir * step, behavior: "smooth" });
+  };
 
   return (
     <section className="section section--soft" id="popular">
@@ -180,23 +189,37 @@ function Popular() {
             <h2 className="section__title">Популярные товары</h2>
             <p className="section__sub">Чаще всего заказывают клиники и частные покупатели</p>
           </div>
-          <Button
-            variant="ghost"
-            size="md"
-            iconRight="arrowSm"
-            onClick={() => navigate(catalogUrl({ popular: true }))}
-          >
-            Смотреть все
-          </Button>
+          <div className="pop-actions">
+            {state.items.length > 1 && (
+              <div className="pop-nav">
+                <button type="button" className="pop-nav__btn" onClick={() => scroll(-1)} aria-label="Назад">
+                  <Icon name="chevron" size={18} style={{ transform: "rotate(180deg)" }} />
+                </button>
+                <button type="button" className="pop-nav__btn" onClick={() => scroll(1)} aria-label="Вперёд">
+                  <Icon name="chevron" size={18} />
+                </button>
+              </div>
+            )}
+            <Button
+              variant="ghost"
+              size="md"
+              iconRight="arrowSm"
+              onClick={() => navigate(catalogUrl({ popular: true }))}
+            >
+              Смотреть все
+            </Button>
+          </div>
         </div>
         {state.loading ? (
           <Loading />
         ) : state.error ? (
           <LoadError error={state.error} retry={load} />
         ) : (
-          <div className="prod-grid">
+          <div className="pop-track" ref={trackRef}>
             {state.items.map((p) => (
-              <ProductCard key={p.id} product={p} />
+              <div className="pop-slide" key={p.id}>
+                <ProductCard product={p} />
+              </div>
             ))}
           </div>
         )}
