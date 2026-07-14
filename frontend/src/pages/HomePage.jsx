@@ -13,26 +13,29 @@ const SLIDES = [
   {
     id: "banner-1",
     tone: "teal",
+    img: "/banners/banner-1.jpg",
     eyebrow: "Каталог",
-    title: "Медицинское оборудование и расходные материалы",
+    title: "Оборудование и материалы для стоматологии",
     cta: "Открыть каталог",
     to: "/catalog",
   },
   {
     id: "banner-2",
-    tone: "azure",
-    eyebrow: "В наличии",
-    title: "Расходные материалы для клиник и больниц",
-    cta: "Смотреть товары",
-    to: catalogUrl({ cat: "rashodnye-materialy" }),
+    tone: "deep",
+    img: "/banners/banner-2.jpg",
+    eyebrow: "Цифровая стоматология",
+    title: "Cad/Cam технологии: сканеры и фрезерные станки",
+    cta: "Смотреть раздел",
+    to: catalogUrl({ cat: "cad-cam-tehnologii" }),
   },
   {
     id: "banner-3",
-    tone: "deep",
-    eyebrow: "Сервис",
-    title: "Оснащение кабинета под ключ за 14 дней",
-    cta: "Популярные товары",
-    to: catalogUrl({ popular: true }),
+    tone: "azure",
+    img: "/banners/banner-3.jpg",
+    eyebrow: "Оснащение",
+    title: "Реанимация и анестезиология под ключ",
+    cta: "Смотреть раздел",
+    to: catalogUrl({ cat: "reanimatsiya-i-anesteziologiya" }),
   },
 ];
 
@@ -66,6 +69,7 @@ function Hero() {
             style={{ opacity: i === active ? 1 : 0, transition: "opacity 0.8s ease" }}
             aria-hidden={i !== active}
           >
+            {s.img && <img className="mc-banner__img" src={s.img} alt="" loading={i === 0 ? "eager" : "lazy"} />}
             <div className="mc-banner__scrim" aria-hidden />
             <div className="mc-banner__copy">
               <span className="mc-banner__eyebrow">{s.eyebrow}</span>
@@ -201,39 +205,8 @@ function Popular() {
   );
 }
 
-function Advantages() {
-  const items = [
-    ["shield", "Только сертификат", "Регистрационные удостоверения Росздравнадзора и декларации ТР ТС на всю продукцию."],
-    ["truck", "Поставка со склада", "Большинство позиций в наличии. Отгрузка и доставка по всей России от 1 дня."],
-    ["box", "Опт и розница", "Гибкие цены для клиник и больниц, спецусловия для постоянных и оптовых клиентов."],
-    ["headset", "Подбор специалистом", "Поможем подобрать оборудование и расходники под задачу, бюджет и нормативы."],
-  ];
-  return (
-    <section className="wrap section" id="advantages">
-      <div className="section__head section__head--center">
-        <h2 className="section__title">Почему выбирают нас</h2>
-        <p className="section__sub">
-          Работаем с медицинскими учреждениями и частными покупателями с 2010 года
-        </p>
-      </div>
-      <div className="adv-grid">
-        {items.map(([icon, title, text]) => (
-          <div key={title} className="adv-card">
-            <span className="adv-card__ic">
-              <Icon name={icon} size={24} />
-            </span>
-            <h3>{title}</h3>
-            <p>{text}</p>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function Certificates() {
   const [certs, setCerts] = useState([]);
-
   useEffect(() => {
     api.getCertificates().then(setCerts).catch(() => setCerts([]));
   }, []);
@@ -241,35 +214,32 @@ function Certificates() {
   if (!certs.length) return null;
 
   return (
-    <section className="section section--ink" id="certificates">
-      <div className="wrap">
-        <div className="section__head section__head--inverse">
-          <div>
-            <h2 className="section__title">Сертификаты и документы</h2>
-            <p className="section__sub">
-              Вся продукция зарегистрирована и разрешена к применению на территории РФ
-            </p>
-          </div>
-          <span className="cert-shield">
-            <Icon name="shield" size={22} /> Проверено
-          </span>
-        </div>
-        <div className="cert-grid">
-          {certs.map((c) => (
-            <div key={c.id} className="cert-card">
-              <span className="cert-card__ic">
-                <Icon name="doc" size={22} />
-              </span>
-              <div className="cert-card__b">
-                <b>{c.title}</b>
-                <small>{c.description}</small>
-                <a className="cert-card__link" href={c.fileUrl} target="_blank" rel="noreferrer">
-                  Открыть документ
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
+    <section className="wrap section" id="advantages">
+      <div className="section__head section__head--center">
+        <h2 className="section__title" id="certificates">Сертификаты и документы</h2>
+        <p className="section__sub">
+          Вся продукция зарегистрирована и разрешена к применению на территории РФ
+        </p>
+      </div>
+      <div className="adv-grid">
+        {certs.map((c) => (
+          <a
+            key={c.id}
+            className="adv-card adv-card--link"
+            href={c.fileUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span className="adv-card__ic">
+              <Icon name="doc" size={24} />
+            </span>
+            <h3>{c.title}</h3>
+            <p>{c.description}</p>
+            <span className="adv-card__more">
+              Открыть документ <Icon name="arrowSm" size={14} />
+            </span>
+          </a>
+        ))}
       </div>
     </section>
   );
@@ -282,7 +252,6 @@ export default function HomePage() {
       <div className="home-reveal">
         <Categories />
         <Popular />
-        <Advantages />
         <Certificates />
       </div>
     </div>

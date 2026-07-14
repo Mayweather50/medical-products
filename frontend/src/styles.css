@@ -1048,7 +1048,7 @@ body {
 .mc-banner__slide--deep  { background: linear-gradient(120deg, #158497, #2bb8ad 55%, #12909a); }
 
 /* фото-слот заполняет слайд */
-.mc-banner__img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+.mc-banner__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; z-index: 0; }
 
 /* затемнение слева для читаемости текста поверх любого фото */
 .mc-banner__scrim {
@@ -1458,3 +1458,9 @@ body {
   box-shadow: none;
 }
 .filter-cats button.is-active .filter-cats__ic { background: transparent; }
+
+/* — Карточки-сертификаты в стиле блока преимуществ — */
+.adv-card--link { text-decoration: none; color: inherit; display: block; transition: transform 0.15s ease; }
+.adv-card--link:hover { transform: translateY(-2px); }
+.adv-card--link:hover h3 { color: var(--accent); }
+.adv-card__more { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; font-size: 13.5px; font-weight: 600; color: var(--accent); }

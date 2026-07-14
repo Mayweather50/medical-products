@@ -1,4 +1,12 @@
 const META = {
+  // Дентальный набор категорий
+  "stomatologicheskoe-oborudovanie": { icon: "dental-unit", shortTitle: "Стомат. оборудование" },
+  "cad-cam-tehnologii": { icon: "cadcam", shortTitle: "Cad/Cam технологии" },
+  "zubotehnicheskoe-oborudovanie": { icon: "lab", shortTitle: "Зуботех. оборудование" },
+  "reanimatsiya-i-anesteziologiya": { icon: "anesthesia", shortTitle: "Реанимация" },
+  "mebel": { icon: "furniture", shortTitle: "Мебель" },
+
+  // Прежние общемедицинские (оставлены на случай отката)
   "rashodnye-materialy": { icon: "consumables", shortTitle: "Расходные материалы" },
   "siz": { icon: "ppe", shortTitle: "СИЗ" },
   "diagnosticheskoe-oborudovanie": { icon: "diagnostics", shortTitle: "Диагностика" },
