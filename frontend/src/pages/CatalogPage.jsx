@@ -15,7 +15,7 @@ import { usePageTitle } from "../lib/usePageTitle";
 const PAGE_SIZE = 24;
 
 export default function CatalogPage() {
-  const { categories } = useCatalog();
+  const { categories, allCategories } = useCatalog();
   const openLead = useLeadModal();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -109,7 +109,7 @@ export default function CatalogPage() {
     return r;
   }, [state.items, sort]);
 
-  const activeCat = categories.find((c) => c.slug === cat);
+  const activeCat = allCategories.find((c) => c.slug === cat);
   usePageTitle(activeCat ? activeCat.title : onlyPopular ? "Популярные товары" : "Каталог товаров");
   const hasFilters = cat || onlyAvail || onlyPopular || query;
   const filterCount = (cat ? 1 : 0) + (onlyAvail ? 1 : 0) + (onlyPopular ? 1 : 0);
@@ -186,6 +186,21 @@ export default function CatalogPage() {
                     <span className="filter-cats__t">{c.shortTitle}</span>
                     <span className="filter-cats__n">{c.count}</span>
                   </button>
+                  {c.children?.length > 0 && (
+                    <ul className="filter-subcats">
+                      {c.children.map((s) => (
+                        <li key={s.id}>
+                          <button
+                            className={cat === s.slug ? "is-active" : ""}
+                            onClick={() => updateParams({ cat: s.slug })}
+                          >
+                            <span className="filter-subcats__t">{s.title}</span>
+                            <span className="filter-cats__n">{s.count}</span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </li>
               ))}
             </ul>

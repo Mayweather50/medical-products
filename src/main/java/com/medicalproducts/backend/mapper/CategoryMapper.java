@@ -26,6 +26,7 @@ public class CategoryMapper {
                 category.getSlug(),
                 category.getDescription(),
                 category.getImageUrl(),
+                category.getParent() != null ? category.getParent().getId() : null,
                 productCount,
                 category.getCreatedAt(),
                 category.getUpdatedAt()

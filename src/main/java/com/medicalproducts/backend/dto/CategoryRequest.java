@@ -15,6 +15,8 @@ public record CategoryRequest(
 
         String description,
 
-        String imageUrl
+        String imageUrl,
+
+        Long parentId
 ) {
 }

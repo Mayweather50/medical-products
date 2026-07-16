@@ -52,7 +52,9 @@ public class CategoryService {
         if (categoryRepository.existsBySlug(request.slug())) {
             throw new IllegalArgumentException("Category with slug '" + request.slug() + "' already exists");
         }
-        Category category = categoryRepository.save(categoryMapper.toEntity(request));
+        Category category = categoryMapper.toEntity(request);
+        category.setParent(resolveParent(request.parentId(), null));
+        category = categoryRepository.save(category);
         log.info("Category created: id={}, title='{}', slug='{}'", category.getId(), category.getTitle(), category.getSlug());
         return categoryMapper.toResponse(category, 0L);
     }
@@ -64,8 +66,24 @@ public class CategoryService {
             throw new IllegalArgumentException("Category with slug '" + request.slug() + "' already exists");
         }
         categoryMapper.updateEntity(category, request);
+        category.setParent(resolveParent(request.parentId(), id));
         log.info("Category updated: id={}, title='{}'", id, request.title());
         return toResponseWithCount(category);
+    }
+
+    /** Находит и валидирует родителя: не сам на себя и без третьего уровня вложенности. */
+    private Category resolveParent(Long parentId, Long selfId) {
+        if (parentId == null) {
+            return null;
+        }
+        if (parentId.equals(selfId)) {
+            throw new IllegalArgumentException("Category cannot be its own parent");
+        }
+        Category parent = findById(parentId);
+        if (parent.getParent() != null) {
+            throw new IllegalArgumentException("Only two-level category nesting is supported");
+        }
+        return parent;
     }
 
     @Transactional

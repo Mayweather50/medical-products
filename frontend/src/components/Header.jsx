@@ -104,22 +104,29 @@ export default function Header() {
               {catOpen && categories.length > 0 && (
                 <div className="megamenu">
                   {categories.map((c) => (
-                    <Link
-                      key={c.id}
-                      className="megamenu__item"
-                      to={catalogUrl({ cat: c.slug })}
-                      onClick={() => setCatOpen(false)}
-                    >
-                      <span className="megamenu__ic" data-cat={c.icon}>
-                        <CatIcon name={c.icon} size={28} />
-                      </span>
-                      <span className="megamenu__t">
+                    <div key={c.id} className="megamenu__col">
+                      <Link
+                        className="megamenu__head"
+                        to={catalogUrl({ cat: c.slug })}
+                        onClick={() => setCatOpen(false)}
+                      >
+                        <span className="megamenu__ic" data-cat={c.icon}>
+                          <CatIcon name={c.icon} size={24} />
+                        </span>
                         <b>{c.shortTitle}</b>
-                        <small>
-                          {c.count} {plural(c.count, ["товар", "товара", "товаров"])}
-                        </small>
-                      </span>
-                    </Link>
+                      </Link>
+                      {c.children?.length > 0 && (
+                        <ul className="megamenu__sub">
+                          {c.children.map((s) => (
+                            <li key={s.id}>
+                              <Link to={catalogUrl({ cat: s.slug })} onClick={() => setCatOpen(false)}>
+                                {s.title}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}
@@ -227,17 +234,29 @@ export default function Header() {
           <nav className="mobile-menu__cats">
             <span className="mobile-menu__label">Каталог</span>
             {categories.map((c) => (
-              <Link
-                key={c.id}
-                className="mobile-menu__cat"
-                to={catalogUrl({ cat: c.slug })}
-                onClick={() => setMenuOpen(false)}
-              >
-                <span className="megamenu__ic" data-cat={c.icon}>
-                  <CatIcon name={c.icon} size={26} />
-                </span>
-                <span>{c.shortTitle}</span>
-              </Link>
+              <div key={c.id} className="mobile-menu__group">
+                <Link
+                  className="mobile-menu__cat"
+                  to={catalogUrl({ cat: c.slug })}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <span className="megamenu__ic" data-cat={c.icon}>
+                    <CatIcon name={c.icon} size={26} />
+                  </span>
+                  <span>{c.shortTitle}</span>
+                </Link>
+                {c.children?.length > 0 && (
+                  <ul className="mobile-menu__sub">
+                    {c.children.map((s) => (
+                      <li key={s.id}>
+                        <Link to={catalogUrl({ cat: s.slug })} onClick={() => setMenuOpen(false)}>
+                          {s.title}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             ))}
           </nav>
 

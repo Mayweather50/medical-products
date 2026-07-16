@@ -6,17 +6,29 @@ import { catMeta } from "../lib/categoryMeta";
    поэтому грузим их один раз и раздаём через контекст.
    reload() — для админки: после правок товаров обновить счётчики. */
 
-const CatalogContext = createContext({ categories: [], loading: true, error: null, reload: () => {} });
+const CatalogContext = createContext({
+  categories: [],
+  allCategories: [],
+  loading: true,
+  error: null,
+  reload: () => {},
+});
 
 export function CatalogProvider({ children }) {
-  const [state, setState] = useState({ categories: [], loading: true, error: null });
+  const [state, setState] = useState({ categories: [], allCategories: [], loading: true, error: null });
 
   const reload = useCallback(() => {
     api
       .getCategories()
       .then((list) => {
-        const categories = list.map((c) => ({ ...c, ...catMeta(c), count: c.productCount }));
-        setState({ categories, loading: false, error: null });
+        const withMeta = list.map((c) => ({ ...c, ...catMeta(c), count: c.productCount }));
+        // Дерево: категории верхнего уровня (parentId=null) с вложенными children
+        const tops = withMeta.filter((c) => !c.parentId);
+        tops.forEach((t) => {
+          t.children = withMeta.filter((c) => c.parentId === t.id);
+          t.count += t.children.reduce((n, ch) => n + ch.count, 0);
+        });
+        setState({ categories: tops, allCategories: withMeta, loading: false, error: null });
       })
       .catch((error) => setState((s) => ({ ...s, loading: false, error })));
   }, []);

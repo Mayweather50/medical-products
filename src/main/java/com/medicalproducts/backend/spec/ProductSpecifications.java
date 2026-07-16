@@ -1,6 +1,8 @@
 package com.medicalproducts.backend.spec;
 
 import com.medicalproducts.backend.entity.Product;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 
 /**
@@ -13,8 +15,13 @@ public final class ProductSpecifications {
     private ProductSpecifications() {
     }
 
+    /** Совпадение по слагу самой категории ИЛИ её родителя — клик по родителю показывает товары подкатегорий. */
     public static Specification<Product> hasCategorySlug(String slug) {
-        return (root, query, cb) -> cb.equal(root.get("category").get("slug"), slug);
+        return (root, query, cb) -> {
+            Join<Object, Object> category = root.join("category", JoinType.LEFT);
+            Join<Object, Object> parent = category.join("parent", JoinType.LEFT);
+            return cb.or(cb.equal(category.get("slug"), slug), cb.equal(parent.get("slug"), slug));
+        };
     }
 
     public static Specification<Product> isAvailable(boolean available) {
