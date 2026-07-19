@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Loading, LoadError } from "../../components/StateBlock";
 import Button from "../../components/Button";
 import ConfirmModal from "../../components/ConfirmModal";
@@ -7,7 +7,7 @@ import { useToast } from "../../components/Toast";
 import { api } from "../../api";
 import { useCatalog } from "../../context/CatalogContext";
 
-const EMPTY_FORM = { title: "", slug: "", description: "", icon: "clinic" };
+const EMPTY_FORM = { title: "", slug: "", description: "", icon: "clinic", photo: "" };
 
 const ICON_OPTIONS = [
   { key: "consumables", label: "Расходные материалы" },
@@ -43,9 +43,26 @@ export default function AdminCategories() {
   const [editing, setEditing] = useState(null);
   const [formErrors, setFormErrors] = useState({});
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const fileRef = useRef(null);
 
   useEffect(() => { reload(); }, []);
+
+  const uploadPhoto = async (file) => {
+    if (!file) return;
+    setUploading(true);
+    setFormErrors((prev) => ({ ...prev, photo: undefined }));
+    try {
+      const { url } = await api.admin.uploadImage(file);
+      setEditing((ed) => ({ ...ed, form: { ...ed.form, photo: url } }));
+    } catch (err) {
+      setFormErrors((prev) => ({ ...prev, photo: err.message }));
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
 
   const openCreate = () => {
     setFormErrors({});
@@ -61,6 +78,7 @@ export default function AdminCategories() {
         slug: c.slug,
         description: c.description || "",
         icon: iconFromImageUrl(c.imageUrl),
+        photo: c.imageUrl && !c.imageUrl.startsWith("icon:") ? c.imageUrl : "",
       },
     });
   };
@@ -78,7 +96,8 @@ export default function AdminCategories() {
       title: f.title.trim(),
       slug: f.slug.trim(),
       description: f.description.trim() || null,
-      imageUrl: "icon:" + f.icon,
+      // Фото имеет приоритет над иконкой; путь /uploads/... хранится в БД
+      imageUrl: f.photo ? f.photo : "icon:" + f.icon,
     };
     try {
       if (editing.category) await api.admin.updateCategory(editing.category.id, payload);
@@ -146,7 +165,13 @@ export default function AdminCategories() {
               {categories.map((c) => (
                 <tr key={c.id}>
                   <td>{c.id}</td>
-                  <td><CatIcon name={iconFromImageUrl(c.imageUrl)} size={22} /></td>
+                  <td>
+                    {c.imageUrl && !c.imageUrl.startsWith("icon:") ? (
+                      <img className="admin-cat-thumb" src={c.imageUrl} alt="" />
+                    ) : (
+                      <CatIcon name={iconFromImageUrl(c.imageUrl)} size={22} />
+                    )}
+                  </td>
                   <td><b>{c.title}</b></td>
                   <td><code>{c.slug}</code></td>
                   <td className="admin-table__txt">{c.description || "—"}</td>
@@ -206,8 +231,46 @@ export default function AdminCategories() {
                 {err("slug")}
               </label>
 
+              <div className={"field" + (formErrors.photo ? " field--err" : "")}>
+                <span className="field__lbl">Фото категории</span>
+                <div className="cat-photo-edit">
+                  {editing.form.photo ? (
+                    <img className="cat-photo-edit__preview" src={editing.form.photo} alt="" />
+                  ) : (
+                    <span className="cat-photo-edit__placeholder">
+                      <CatIcon name={editing.form.icon} size={30} />
+                    </span>
+                  )}
+                  <div className="cat-photo-edit__ctrl">
+                    <input
+                      ref={fileRef}
+                      type="file"
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={(e) => uploadPhoto(e.target.files?.[0])}
+                    />
+                    <Button
+                      type="button" variant="outline" size="sm"
+                      disabled={uploading}
+                      onClick={() => fileRef.current && fileRef.current.click()}
+                    >
+                      {uploading ? "Загрузка…" : editing.form.photo ? "Заменить фото" : "Загрузить фото"}
+                    </Button>
+                    {editing.form.photo && (
+                      <Button
+                        type="button" variant="ghost" size="sm"
+                        onClick={() => setEditing((ed) => ({ ...ed, form: { ...ed.form, photo: "" } }))}
+                      >
+                        Убрать
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                {err("photo")}
+              </div>
+
               <div className="field">
-                <span className="field__lbl">Иконка</span>
+                <span className="field__lbl">Иконка {editing.form.photo && <small>(используется, если нет фото)</small>}</span>
                 <div className="icon-picker">
                   {ICON_OPTIONS.map((opt) => (
                     <button

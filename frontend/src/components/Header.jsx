@@ -191,19 +191,21 @@ export default function Header() {
               <b className="head-cart__n">{cart.count}</b>
             </Link>
 
-            <Link
-              className="head-icon"
-              to={user ? (isAdmin ? "/admin" : "/") : "/login"}
-              onClick={(e) => {
-                setMenuOpen(false);
-                if (user && !isAdmin) { e.preventDefault(); logout(); }
-              }}
-              aria-label={user ? (isAdmin ? "Админ-панель" : "Выйти") : "Войти"}
-              title={user ? (isAdmin ? `Админ-панель (${user.username})` : `Выйти (${user.username})`) : "Войти"}
-            >
-              <Icon name={user && !isAdmin ? "logout" : "user"} size={20} />
-              {user && <span className="head-icon__dot" />}
-            </Link>
+            {user && (
+              <Link
+                className="head-icon"
+                to={isAdmin ? "/admin" : "/"}
+                onClick={(e) => {
+                  setMenuOpen(false);
+                  if (!isAdmin) { e.preventDefault(); logout(); }
+                }}
+                aria-label={isAdmin ? "Админ-панель" : "Выйти"}
+                title={isAdmin ? `Админ-панель (${user.username})` : `Выйти (${user.username})`}
+              >
+                <Icon name={!isAdmin ? "logout" : "user"} size={20} />
+                <span className="head-icon__dot" />
+              </Link>
+            )}
 
             <button
               className="head-burger"

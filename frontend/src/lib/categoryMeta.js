@@ -1,12 +1,22 @@
 const META = {
-  // Дентальный набор категорий
+  // Дентальный набор категорий (иконки — запасной вариант, если у категории нет фото)
+  "3d-tehnologii": { icon: "cadcam", shortTitle: "3D технологии" },
   "stomatologicheskoe-oborudovanie": { icon: "dental-unit", shortTitle: "Стомат. оборудование" },
-  "cad-cam-tehnologii": { icon: "cadcam", shortTitle: "Cad/Cam технологии" },
+  "stomatologicheskie-materialy": { icon: "consumables", shortTitle: "Стомат. материалы" },
+  "zubotehnicheskie-materialy": { icon: "consumables", shortTitle: "Зуботех. материалы" },
   "zubotehnicheskoe-oborudovanie": { icon: "lab", shortTitle: "Зуботех. оборудование" },
+  "implantologiya-i-hirurgiya": { icon: "dental-unit", shortTitle: "Имплантология" },
+  "instrumenty": { icon: "clinic", shortTitle: "Инструменты" },
+  "rentgen-oborudovanie": { icon: "diagnostics", shortTitle: "Рентген" },
+  "dezinfektsiya-i-sterilizatsiya": { icon: "disinfection", shortTitle: "Дезинфекция" },
+  "anesteziya": { icon: "anesthesia", shortTitle: "Анестезия" },
+  "skalery-i-nasadki": { icon: "dental-unit", shortTitle: "Скалеры и насадки" },
+  "gigiena-i-profilaktika": { icon: "care", shortTitle: "Гигиена" },
+
+  // Прежние наборы (оставлены на случай отката)
+  "cad-cam-tehnologii": { icon: "cadcam", shortTitle: "Cad/Cam технологии" },
   "reanimatsiya-i-anesteziologiya": { icon: "anesthesia", shortTitle: "Реанимация" },
   "mebel": { icon: "furniture", shortTitle: "Мебель" },
-
-  // Прежние общемедицинские (оставлены на случай отката)
   "rashodnye-materialy": { icon: "consumables", shortTitle: "Расходные материалы" },
   "siz": { icon: "ppe", shortTitle: "СИЗ" },
   "diagnosticheskoe-oborudovanie": { icon: "diagnostics", shortTitle: "Диагностика" },

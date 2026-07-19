@@ -117,6 +117,42 @@ function Hero() {
   );
 }
 
+function CategoryCard({ c }) {
+  const photo = c.imageUrl && !c.imageUrl.startsWith("icon:") ? c.imageUrl : null;
+  const [showPhoto, setShowPhoto] = useState(Boolean(photo));
+
+  return (
+    <Link
+      className={"cat-card" + (showPhoto ? " cat-card--photo" : "")}
+      data-cat={c.icon}
+      to={catalogUrl({ cat: c.slug })}
+    >
+      {showPhoto ? (
+        <img
+          className="cat-card__img"
+          src={photo}
+          alt=""
+          loading="lazy"
+          onError={() => setShowPhoto(false)}
+        />
+      ) : (
+        <span className="cat-card__ic">
+          <CatIcon name={c.icon} size={40} />
+        </span>
+      )}
+      <span className="cat-card__body">
+        <b>{c.shortTitle}</b>
+        <small>
+          {c.count} {plural(c.count, ["товар", "товара", "товаров"])}
+        </small>
+      </span>
+      <span className="cat-card__arr">
+        <Icon name="arrowSm" size={18} />
+      </span>
+    </Link>
+  );
+}
+
 function Categories() {
   const { categories, loading } = useCatalog();
 
@@ -138,20 +174,7 @@ function Categories() {
       ) : (
         <div className="cat-grid">
           {categories.map((c) => (
-            <Link key={c.id} className="cat-card" data-cat={c.icon} to={catalogUrl({ cat: c.slug })}>
-              <span className="cat-card__ic">
-                <CatIcon name={c.icon} size={40} />
-              </span>
-              <span className="cat-card__body">
-                <b>{c.shortTitle}</b>
-                <small>
-                  {c.count} {plural(c.count, ["товар", "товара", "товаров"])}
-                </small>
-              </span>
-              <span className="cat-card__arr">
-                <Icon name="arrowSm" size={18} />
-              </span>
-            </Link>
+            <CategoryCard key={c.id} c={c} />
           ))}
         </div>
       )}

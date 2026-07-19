@@ -489,6 +489,24 @@ img { max-width: 100%; display: block; }
 .cat-card__arr { color: var(--steel); transition: transform 0.18s ease; }
 .cat-card:hover .cat-card__arr { transform: translateX(4px); color: var(--ink); }
 
+/* Фото-плитки категорий (референс stomatorg): название сверху-слева, фото снизу-справа */
+.cat-card--photo { position: relative; align-items: flex-start; min-height: 150px; overflow: hidden; }
+.cat-card--photo .cat-card__body { position: relative; z-index: 2; max-width: 60%; }
+.cat-card__img {
+  position: absolute; right: 8px; bottom: 8px;
+  width: 56%; height: 72%; object-fit: contain; object-position: right bottom;
+  z-index: 1; pointer-events: none;
+}
+.cat-card--photo:hover .cat-card__img { transform: scale(1.03); transition: transform 0.25s ease; }
+.cat-card--photo .cat-card__arr { display: none; }
+
+/* Загрузка фото категории в админке */
+.cat-photo-edit { display: flex; align-items: center; gap: 14px; }
+.cat-photo-edit__preview { width: 96px; height: 68px; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); background: #fff; }
+.cat-photo-edit__placeholder { width: 96px; height: 68px; display: grid; place-items: center; border-radius: 10px; border: 1px dashed var(--line-strong); color: var(--steel); flex-shrink: 0; }
+.cat-photo-edit__ctrl { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.admin-cat-thumb { width: 42px; height: 32px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); display: block; }
+
 /* Преимущества (нумерованные) */
 .adv-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid var(--line); }
 .adv-card { padding: 30px 26px 30px 0; border-right: 1px solid var(--line); }
