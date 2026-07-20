@@ -19,6 +19,7 @@ export default function Header() {
 
   const [search, setSearch] = useState("");
   const [catOpen, setCatOpen] = useState(false);
+  const [hoverCat, setHoverCat] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -101,23 +102,47 @@ export default function Header() {
                 Каталог
                 <Icon name="plus" size={15} className="head-cat__plus" />
               </button>
-              {catOpen && categories.length > 0 && (
-                <div className="megamenu">
-                  {categories.map((c) => (
-                    <div key={c.id} className="megamenu__col">
+              {catOpen && categories.length > 0 && (() => {
+                const active =
+                  categories.find((c) => c.id === hoverCat) ||
+                  categories.find((c) => c.children?.length > 0) ||
+                  categories[0];
+                return (
+                  <div className="megamenu">
+                    <ul className="megamenu__cats">
+                      {categories.map((c) => (
+                        <li
+                          key={c.id}
+                          onMouseEnter={() => setHoverCat(c.id)}
+                        >
+                          <Link
+                            className={"megamenu__cat" + (active?.id === c.id ? " is-active" : "")}
+                            to={catalogUrl({ cat: c.slug })}
+                            onClick={() => setCatOpen(false)}
+                          >
+                            <span className="megamenu__ic" data-cat={c.icon}>
+                              <CatIcon name={c.icon} size={22} />
+                            </span>
+                            <b>{c.shortTitle}</b>
+                            {c.children?.length > 0 && (
+                              <Icon name="chevron" size={14} className="megamenu__cat-arr" />
+                            )}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="megamenu__panel">
                       <Link
-                        className="megamenu__head"
-                        to={catalogUrl({ cat: c.slug })}
+                        className="megamenu__panel-head"
+                        to={catalogUrl({ cat: active.slug })}
                         onClick={() => setCatOpen(false)}
                       >
-                        <span className="megamenu__ic" data-cat={c.icon}>
-                          <CatIcon name={c.icon} size={24} />
-                        </span>
-                        <b>{c.shortTitle}</b>
+                        {active.shortTitle}
+                        <Icon name="arrowSm" size={15} />
                       </Link>
-                      {c.children?.length > 0 && (
+                      {active.children?.length > 0 ? (
                         <ul className="megamenu__sub">
-                          {c.children.map((s) => (
+                          {active.children.map((s) => (
                             <li key={s.id}>
                               <Link to={catalogUrl({ cat: s.slug })} onClick={() => setCatOpen(false)}>
                                 {s.title}
@@ -125,11 +150,13 @@ export default function Header() {
                             </li>
                           ))}
                         </ul>
+                      ) : (
+                        <p className="megamenu__empty">Смотреть все товары раздела</p>
                       )}
                     </div>
-                  ))}
-                </div>
-              )}
+                  </div>
+                );
+              })()}
             </div>
           </nav>
 

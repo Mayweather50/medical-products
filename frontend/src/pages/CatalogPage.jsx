@@ -174,35 +174,41 @@ export default function CatalogPage() {
                   </span>
                 </button>
               </li>
-              {categories.map((c) => (
-                <li key={c.id}>
-                  <button
-                    className={cat === c.slug ? "is-active" : ""}
-                    onClick={() => updateParams({ cat: c.slug })}
-                  >
-                    <span className="filter-cats__ic" data-cat={c.icon}>
-                      <CatIcon name={c.icon} size={21} />
-                    </span>
-                    <span className="filter-cats__t">{c.shortTitle}</span>
-                    <span className="filter-cats__n">{c.count}</span>
-                  </button>
-                  {c.children?.length > 0 && (
-                    <ul className="filter-subcats">
-                      {c.children.map((s) => (
-                        <li key={s.id}>
-                          <button
-                            className={cat === s.slug ? "is-active" : ""}
-                            onClick={() => updateParams({ cat: s.slug })}
-                          >
-                            <span className="filter-subcats__t">{s.title}</span>
-                            <span className="filter-cats__n">{s.count}</span>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </li>
-              ))}
+              {categories.map((c) => {
+                const hasKids = c.children?.length > 0;
+                const kidActive = c.children?.some((s) => s.slug === cat);
+                return (
+                  <li key={c.id} className={"filter-cat" + (hasKids ? " has-kids" : "")}>
+                    <button
+                      className={cat === c.slug || kidActive ? "is-active" : ""}
+                      onClick={() => updateParams({ cat: c.slug })}
+                    >
+                      <span className="filter-cats__ic" data-cat={c.icon}>
+                        <CatIcon name={c.icon} size={21} />
+                      </span>
+                      <span className="filter-cats__t">{c.shortTitle}</span>
+                      <span className="filter-cats__n">{c.count}</span>
+                      {hasKids && <Icon name="chevron" size={14} className="filter-cats__arr" />}
+                    </button>
+                    {hasKids && (
+                      <ul className="filter-flyout">
+                        <li className="filter-flyout__head">{c.shortTitle}</li>
+                        {c.children.map((s) => (
+                          <li key={s.id}>
+                            <button
+                              className={cat === s.slug ? "is-active" : ""}
+                              onClick={() => updateParams({ cat: s.slug })}
+                            >
+                              <span className="filter-subcats__t">{s.title}</span>
+                              <span className="filter-cats__n">{s.count}</span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
 
