@@ -15,7 +15,9 @@ import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -50,8 +52,14 @@ public class Product extends BaseEntity {
     @Column(name = "price_on_request", nullable = false)
     private boolean priceOnRequest = false;
 
+    /** Обложка — первый кадр галереи; её показывают плитки каталога. */
     @Column(name = "image_url")
     private String imageUrl;
+
+    /** Галерея товара в порядке показа. */
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb", nullable = false)
+    private List<String> images = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)

@@ -116,7 +116,12 @@ public class ExcelImportService {
         }
 
         product.setPriceOnRequest(getBooleanCell(row, 6));
-        product.setImageUrl(getStringCell(row, 7));
+        String imageUrl = getStringCell(row, 7);
+        product.setImageUrl(imageUrl);
+        // Галерея из импорта = одна обложка; остальные кадры добавляются в админке.
+        product.setImages(imageUrl == null || imageUrl.isBlank()
+                ? new ArrayList<>()
+                : new ArrayList<>(List.of(imageUrl)));
         product.setCategory(category);
         product.setAvailable(getBooleanCell(row, 9, true));
         product.setPopular(getBooleanCell(row, 10));

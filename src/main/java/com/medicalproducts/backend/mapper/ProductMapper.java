@@ -7,7 +7,9 @@ import com.medicalproducts.backend.entity.Product;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -36,6 +38,7 @@ public class ProductMapper {
                 product.getPrice(),
                 product.isPriceOnRequest(),
                 product.getImageUrl(),
+                product.getImages(),
                 categoryMapper.toSummary(product.getCategory()),
                 product.getCharacteristics(),
                 product.isAvailable(),
@@ -53,12 +56,35 @@ public class ProductMapper {
         product.setDescription(request.description());
         product.setPrice(request.price());
         product.setPriceOnRequest(Boolean.TRUE.equals(request.priceOnRequest()));
-        product.setImageUrl(request.imageUrl());
+        applyImages(product, request);
         product.setCategory(category);
         product.setCharacteristics(request.characteristics() == null
                 ? new LinkedHashMap<>()
                 : new LinkedHashMap<>(request.characteristics()));
         product.setAvailable(request.available() == null || request.available());
         product.setPopular(Boolean.TRUE.equals(request.popular()));
+    }
+
+    /**
+     * Держит обложку и галерею согласованными: обложка — всегда первый кадр.
+     * Клиент может прислать только imageUrl (старый формат) или только images.
+     */
+    private void applyImages(Product product, ProductRequest request) {
+        List<String> images = request.images() == null ? List.of() : request.images().stream()
+                .filter(url -> url != null && !url.isBlank())
+                .map(String::trim)
+                .distinct()
+                .toList();
+
+        if (images.isEmpty()) {
+            String cover = request.imageUrl();
+            boolean hasCover = cover != null && !cover.isBlank();
+            product.setImageUrl(hasCover ? cover.trim() : null);
+            product.setImages(hasCover ? new ArrayList<>(List.of(cover.trim())) : new ArrayList<>());
+            return;
+        }
+
+        product.setImages(new ArrayList<>(images));
+        product.setImageUrl(images.get(0));
     }
 }

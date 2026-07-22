@@ -25,3 +25,6 @@ Thumbs.db
 
 # Docker image archives (для переноса на VPS)
 *.tar
+
+# Локальные скрипты деплоя (содержат креды сервера)
+.deploy/

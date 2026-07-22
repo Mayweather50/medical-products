@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Badge from "../components/Badge";
 import Breadcrumbs from "../components/Breadcrumbs";
 import Button from "../components/Button";
-import ProductImage from "../components/ProductImage";
+import ProductGallery from "../components/ProductGallery";
 import { Icon } from "../components/Icon";
 import { Loading, LoadError } from "../components/StateBlock";
 import { api } from "../api";
@@ -98,7 +98,7 @@ export default function ProductPage() {
       <div className="wrap">
         <div className="cliniq-hero">
           <div className="cliniq-hero__img">
-            <ProductImage product={p} size={130} className="cliniq-hero__pic" />
+            <ProductGallery product={p} className="cliniq-hero__pic" />
           </div>
           <div className="cliniq-hero__info">
             <div className="cliniq-hero__tags">

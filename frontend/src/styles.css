@@ -654,6 +654,24 @@ img { max-width: 100%; display: block; }
 .cliniq-hero > * { position: relative; z-index: 1; }
 .cliniq-hero__img { display: flex; align-items: center; justify-content: center; }
 .cliniq-hero__pic.prod-img { aspect-ratio: 1 / 1; border-radius: var(--r-xl); width: 100%; max-width: 380px; border: none; box-shadow: var(--sh-lg); }
+
+/* Галерея товара: крупный кадр + миниатюры под ним */
+.prod-gallery { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 380px; }
+.prod-gallery__main {
+  aspect-ratio: 1 / 1; border-radius: var(--r-xl); overflow: hidden;
+  background: #fff; box-shadow: var(--sh-lg);
+}
+.prod-gallery__main img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.prod-gallery__thumbs { display: flex; gap: 8px; flex-wrap: wrap; }
+.prod-gallery__thumb {
+  width: 64px; height: 64px; padding: 0; overflow: hidden; cursor: pointer;
+  border: 2px solid var(--line); border-radius: var(--r-sm); background: #fff;
+  transition: border-color 0.14s ease, transform 0.14s ease;
+}
+.prod-gallery__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.prod-gallery__thumb:hover { border-color: var(--primary); transform: translateY(-2px); }
+.prod-gallery__thumb.is-active { border-color: var(--primary); }
+
 .cliniq-hero__info { display: flex; flex-direction: column; align-items: flex-start; }
 .cliniq-hero__tags { display: flex; gap: 8px; margin-bottom: 18px; }
 .cliniq-hero__title { font-size: clamp(30px, 3.4vw, 46px); font-weight: 800; letter-spacing: -0.04em; line-height: 1.02; color: var(--ink); }
@@ -1379,7 +1397,11 @@ body {
 .icon-picker__item { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--line); border-radius: var(--r-sm); background: var(--surface); color: var(--muted); transition: all 0.14s ease; }
 .icon-picker__item:hover { border-color: var(--primary); color: var(--primary); }
 .icon-picker__item.is-active { border-color: var(--primary); color: var(--primary); background: var(--primary-softer); }
-.admin-form__image-upload { display: flex; align-items: flex-end; gap: 12px; }
+.admin-form__image-upload { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+.admin-form__image-preview.is-cover { border-color: var(--primary); }
+.admin-form__image-badge { position: absolute; left: 0; right: 0; bottom: 0; padding: 2px 0; text-align: center; font-size: 10px; font-weight: 700; background: rgba(0,0,0,0.6); color: #fff; }
+.admin-form__image-cover { position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border: none; background: rgba(0,0,0,0.55); color: #fff; border-radius: 50%; cursor: pointer; }
+.admin-form__image-cover:hover { background: var(--primary); }
 .admin-form__image-preview { position: relative; width: 100px; height: 100px; border-radius: var(--r-sm); overflow: hidden; border: 1px solid var(--line-2); }
 .admin-form__image-preview img { width: 100%; height: 100%; object-fit: cover; }
 .admin-form__image-remove { position: absolute; top: 2px; right: 2px; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border: none; background: rgba(0,0,0,0.55); color: #fff; border-radius: 50%; cursor: pointer; }

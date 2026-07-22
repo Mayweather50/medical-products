@@ -2,6 +2,7 @@ package com.medicalproducts.backend.dto;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 
 public record ProductResponse(
@@ -14,6 +15,7 @@ public record ProductResponse(
         BigDecimal price,
         boolean priceOnRequest,
         String imageUrl,
+        List<String> images,
         CategorySummaryResponse category,
         Map<String, String> characteristics,
         boolean available,

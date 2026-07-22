@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 public record ProductRequest(
@@ -32,6 +33,9 @@ public record ProductRequest(
         Boolean priceOnRequest,
 
         String imageUrl,
+
+        @Size(max = 12, message = "images must have at most 12 entries")
+        List<String> images,
 
         @NotNull(message = "categoryId is required")
         Long categoryId,

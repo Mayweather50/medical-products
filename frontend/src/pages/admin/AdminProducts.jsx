@@ -19,7 +19,7 @@ const EMPTY_FORM = {
   priceOnRequest: false,
   shortDescription: "",
   description: "",
-  imageUrl: "",
+  images: [],
   available: true,
   popular: false,
   characteristics: "",
@@ -99,7 +99,7 @@ export default function AdminProducts() {
         priceOnRequest: p.priceOnRequest,
         shortDescription: p.shortDescription || "",
         description: p.description || "",
-        imageUrl: p.imageUrl || "",
+        images: p.images?.length ? [...p.images] : p.imageUrl ? [p.imageUrl] : [],
         available: p.available,
         popular: p.popular,
         characteristics: charsToText(p.characteristics),
@@ -127,7 +127,9 @@ export default function AdminProducts() {
       priceOnRequest: f.priceOnRequest,
       shortDescription: f.shortDescription.trim() || null,
       description: f.description.trim() || null,
-      imageUrl: f.imageUrl.trim() || null,
+      // Обложка — первый кадр галереи; бэкенд держит их согласованными.
+      imageUrl: f.images[0] || null,
+      images: f.images,
       available: f.available,
       popular: f.popular,
       characteristics: textToChars(f.characteristics),
@@ -167,13 +169,17 @@ export default function AdminProducts() {
   };
 
 
-  const uploadImage = async (file) => {
+  /** Догружает выбранные файлы в конец галереи. */
+  const uploadImages = async (files) => {
     setUploading(true);
+    setFormErrors((prev) => ({ ...prev, images: undefined }));
     try {
-      const { url } = await api.admin.uploadImage(file);
-      setEditing((ed) => ({ ...ed, form: { ...ed.form, imageUrl: url } }));
+      for (const file of files) {
+        const { url } = await api.admin.uploadImage(file);
+        setEditing((ed) => ({ ...ed, form: { ...ed.form, images: [...ed.form.images, url] } }));
+      }
     } catch (err) {
-      setFormErrors((prev) => ({ ...prev, imageUrl: err.message }));
+      setFormErrors((prev) => ({ ...prev, images: err.message }));
     } finally {
       setUploading(false);
       if (imgRef.current) imgRef.current.value = "";
@@ -381,31 +387,61 @@ export default function AdminProducts() {
                   {err("price")}{err("priceValid")}
                 </label>
 
-                <div className={"field" + (formErrors.imageUrl ? " field--err" : "")}>
-                  <span className="field__lbl">Изображение</span>
+                <div className={"field" + (formErrors.images ? " field--err" : "")}>
+                  <span className="field__lbl">
+                    Фотографии {editing.form.images.length > 0 && <small>(первая — обложка)</small>}
+                  </span>
                   <input
                     ref={imgRef}
                     type="file"
                     accept="image/jpeg,image/png,image/webp,image/gif"
+                    multiple
                     hidden
-                    onChange={(e) => e.target.files[0] && uploadImage(e.target.files[0])}
+                    onChange={(e) => e.target.files.length && uploadImages([...e.target.files])}
                   />
                   <div className="admin-form__image-upload">
-                    {editing.form.imageUrl && (
-                      <div className="admin-form__image-preview">
-                        <img src={editing.form.imageUrl} alt="Превью" />
-                        <button type="button" className="admin-form__image-remove"
-                                onClick={() => setEditing((ed) => ({ ...ed, form: { ...ed.form, imageUrl: "" } }))}>
+                    {editing.form.images.map((url, i) => (
+                      <div
+                        key={url}
+                        className={"admin-form__image-preview" + (i === 0 ? " is-cover" : "")}
+                      >
+                        <img src={url} alt="" />
+                        {i === 0 && <span className="admin-form__image-badge">Обложка</span>}
+                        {i > 0 && (
+                          <button
+                            type="button"
+                            className="admin-form__image-cover"
+                            title="Сделать обложкой"
+                            onClick={() => setEditing((ed) => ({
+                              ...ed,
+                              form: {
+                                ...ed.form,
+                                images: [url, ...ed.form.images.filter((u) => u !== url)],
+                              },
+                            }))}
+                          >
+                            <Icon name="star" size={13} />
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          className="admin-form__image-remove"
+                          title="Убрать"
+                          onClick={() => setEditing((ed) => ({
+                            ...ed,
+                            form: { ...ed.form, images: ed.form.images.filter((u) => u !== url) },
+                          }))}
+                        >
                           <Icon name="close" size={14} />
                         </button>
                       </div>
-                    )}
+                    ))}
                     <Button type="button" variant="outline" size="sm" icon="doc" disabled={uploading}
                             onClick={() => imgRef.current?.click()}>
-                      {uploading ? "Загружаем…" : editing.form.imageUrl ? "Заменить" : "Загрузить"}
+                      {uploading ? "Загружаем…" : editing.form.images.length ? "Добавить ещё" : "Загрузить"}
                     </Button>
                   </div>
-                  {err("imageUrl")}
+                  {err("images")}
                 </div>
               </div>
 
