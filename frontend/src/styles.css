@@ -520,6 +520,21 @@ img { max-width: 100%; display: block; }
 .cat-photo-edit__ctrl { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .admin-cat-thumb { width: 42px; height: 32px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); display: block; }
 
+/* Баннеры в админке */
+.admin-banner-thumb { width: 96px; height: 40px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); display: block; }
+.admin-banner-thumb--empty { display: grid; place-items: center; color: var(--steel); background: var(--mercury-soft); }
+.admin-table__sub { font-size: 12px; color: var(--steel); margin-top: 3px; }
+.admin-toggle { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--mercury-soft); color: var(--steel); cursor: pointer; transition: all 0.14s ease; }
+.admin-toggle.is-on { border-color: var(--primary); background: var(--primary-softer); color: var(--primary); }
+.banner-photo-edit__preview { width: 200px; height: 84px; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); background: #fff; flex-shrink: 0; }
+.banner-photo-edit__placeholder { width: 200px; height: 84px; display: grid; place-items: center; border-radius: 10px; border: 1px dashed var(--line-strong); color: var(--steel); font-size: 13px; flex-shrink: 0; }
+.tone-picker { display: flex; flex-wrap: wrap; gap: 8px; }
+.tone-picker__item { padding: 9px 14px; font-size: 13px; font-weight: 600; color: #fff; border: 2px solid transparent; border-radius: var(--r-sm); cursor: pointer; transition: all 0.14s ease; }
+.tone-picker__item--teal { background: linear-gradient(120deg, #1b7f99, #2ba7bd 58%, #167f97); }
+.tone-picker__item--deep { background: linear-gradient(120deg, #158497, #2bb8ad 55%, #12909a); }
+.tone-picker__item--azure { background: linear-gradient(120deg, #2493b8, #47c2d6 58%, #1c8dab); }
+.tone-picker__item.is-active { border-color: var(--ink); box-shadow: var(--sh-sm); }
+
 /* Преимущества (нумерованные) */
 .adv-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid var(--line); }
 .adv-card { padding: 30px 26px 30px 0; border-right: 1px solid var(--line); }

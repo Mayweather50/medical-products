@@ -64,6 +64,9 @@ export const api = {
 
   getCertificates: () => request("/api/certificates"),
 
+  /** Активные слайды баннера главной страницы */
+  getBanners: () => request("/api/banners"),
+
   /** POST /api/leads: { name, phone, email?, comment?, productName? } */
   createLead: (payload) =>
     request("/api/leads", { method: "POST", body: JSON.stringify(payload) }),
@@ -115,5 +118,17 @@ export const api = {
     updateCategory: (id, payload) =>
       request(`/api/admin/categories/${id}`, { method: "PUT", body: JSON.stringify(payload) }),
     deleteCategory: (id) => request(`/api/admin/categories/${id}`, { method: "DELETE" }),
+
+    getBanners: () => request("/api/admin/banners"),
+    createBanner: (payload) =>
+      request("/api/admin/banners", { method: "POST", body: JSON.stringify(payload) }),
+    updateBanner: (id, payload) =>
+      request(`/api/admin/banners/${id}`, { method: "PUT", body: JSON.stringify(payload) }),
+    deleteBanner: (id) => request(`/api/admin/banners/${id}`, { method: "DELETE" }),
+    uploadBannerImage: (file) => {
+      const fd = new FormData();
+      fd.append("file", file);
+      return request("/api/admin/banners/upload-image", { method: "POST", body: fd });
+    },
   },
 };

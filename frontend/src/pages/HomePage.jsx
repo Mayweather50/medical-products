@@ -9,7 +9,8 @@ import { catalogUrl, plural } from "../lib/format";
 import { useCatalog } from "../context/CatalogContext";
 import { useLeadModal } from "../context/LeadModalContext";
 
-const SLIDES = [
+/* Показываем, пока баннеры не загрузились и если из админки не пришло ни одного. */
+const FALLBACK_SLIDES = [
   {
     id: "banner-1",
     tone: "teal",
@@ -39,20 +40,48 @@ const SLIDES = [
   },
 ];
 
+/* Слайд из админки → форма, которую рисует Hero. */
+function toSlide(b) {
+  return {
+    id: `banner-${b.id}`,
+    tone: b.tone || "teal",
+    img: b.imageUrl || "",
+    eyebrow: b.eyebrow || "",
+    title: b.title,
+    cta: b.ctaLabel || "",
+    to: b.linkUrl || "",
+  };
+}
+
 function Hero() {
   const navigate = useNavigate();
+  const [slides, setSlides] = useState(FALLBACK_SLIDES);
   const [active, setActive] = useState(0);
   const timer = useRef(null);
 
-  const go = (i) => setActive((i + SLIDES.length) % SLIDES.length);
+  /* Баннеры редактируются в админке; при ошибке остаются запасные. */
+  useEffect(() => {
+    let cancelled = false;
+    api.getBanners()
+      .then((list) => {
+        if (!cancelled && list?.length) {
+          setSlides(list.map(toSlide));
+          setActive(0);
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  const go = (i) => setActive((i + slides.length) % slides.length);
 
   /* Автолистание с паузой при наведении */
   const start = () => {
     stop();
-    timer.current = setInterval(() => setActive((a) => (a + 1) % SLIDES.length), 6000);
+    timer.current = setInterval(() => setActive((a) => (a + 1) % slides.length), 6000);
   };
   const stop = () => { if (timer.current) clearInterval(timer.current); };
-  useEffect(() => { start(); return stop; }, []);
+  useEffect(() => { start(); return stop; }, [slides.length]);
 
   return (
     <section
@@ -62,7 +91,7 @@ function Hero() {
       aria-label="Баннер"
     >
       <div className="mc-banner__track">
-        {SLIDES.map((s, i) => (
+        {slides.map((s, i) => (
           <div
             key={s.id}
             className={`mc-banner__slide mc-banner__slide--${s.tone}`}
@@ -72,13 +101,15 @@ function Hero() {
             {s.img && <img className="mc-banner__img" src={s.img} alt="" loading={i === 0 ? "eager" : "lazy"} />}
             <div className="mc-banner__scrim" aria-hidden />
             <div className="mc-banner__copy">
-              <span className="mc-banner__eyebrow">{s.eyebrow}</span>
+              {s.eyebrow && <span className="mc-banner__eyebrow">{s.eyebrow}</span>}
               <h1 className="mc-banner__title">{s.title}</h1>
-              <div className="mc-banner__cta">
-                <Button variant="primary" size="lg" iconRight="arrow" onClick={() => navigate(s.to)}>
-                  {s.cta}
-                </Button>
-              </div>
+              {s.cta && s.to && (
+                <div className="mc-banner__cta">
+                  <Button variant="primary" size="lg" iconRight="arrow" onClick={() => navigate(s.to)}>
+                    {s.cta}
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         ))}
@@ -102,7 +133,7 @@ function Hero() {
       </button>
 
       <div className="mc-banner__dots" role="tablist">
-        {SLIDES.map((s, i) => (
+        {slides.map((s, i) => (
           <button
             key={s.id}
             type="button"

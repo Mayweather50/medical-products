@@ -29,6 +29,9 @@ export default function AdminLayout() {
         <NavLink to="/admin/categories">
           <Icon name="star" size={17} /> Категории
         </NavLink>
+        <NavLink to="/admin/banners">
+          <Icon name="image" size={17} /> Баннеры
+        </NavLink>
         <NavLink to="/admin/trash">
           <Icon name="trash" size={17} /> Корзина
         </NavLink>
