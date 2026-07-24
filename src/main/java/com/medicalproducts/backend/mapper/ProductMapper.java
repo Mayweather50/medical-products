@@ -1,10 +1,13 @@
 package com.medicalproducts.backend.mapper;
 
+import com.medicalproducts.backend.dto.CategorySummaryResponse;
 import com.medicalproducts.backend.dto.ProductRequest;
 import com.medicalproducts.backend.dto.ProductResponse;
 import com.medicalproducts.backend.entity.Category;
 import com.medicalproducts.backend.entity.Product;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.ObjectNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -39,13 +42,31 @@ public class ProductMapper {
                 product.isPriceOnRequest(),
                 product.getImageUrl(),
                 product.getImages(),
-                categoryMapper.toSummary(product.getCategory()),
+                resolveCategorySummary(product),
                 product.getCharacteristics(),
                 product.isAvailable(),
                 product.isPopular(),
                 product.getCreatedAt(),
                 product.getUpdatedAt()
         );
+    }
+
+    /**
+     * Категория товара может быть мягко удалена (@SQLRestriction скрывает её от загрузки).
+     * Такое бывает у товаров в корзине, оставшихся от прежних категорий: обращение к
+     * ленивому прокси кидает ObjectNotFoundException и рушит всю выдачу. Здесь глушим это —
+     * товар просто отдаётся без категории (в корзине показывается «—»).
+     */
+    private CategorySummaryResponse resolveCategorySummary(Product product) {
+        Category category = product.getCategory();
+        if (category == null) {
+            return null;
+        }
+        try {
+            return categoryMapper.toSummary(category);
+        } catch (ObjectNotFoundException | EntityNotFoundException ex) {
+            return null;
+        }
     }
 
     private void applyRequest(Product product, ProductRequest request, Category category) {
