@@ -8,6 +8,7 @@ const META = {
   "implantologiya-i-hirurgiya": { icon: "dental-unit", shortTitle: "Имплантология" },
   "instrumenty": { icon: "clinic", shortTitle: "Инструменты" },
   "rentgen-oborudovanie": { icon: "diagnostics", shortTitle: "Рентген" },
+  "sterilizatsiya": { icon: "disinfection", shortTitle: "Стерилизация" },
   "dezinfektsiya-i-sterilizatsiya": { icon: "disinfection", shortTitle: "Дезинфекция" },
   "anesteziya": { icon: "anesthesia", shortTitle: "Анестезия" },
   "skalery-i-nasadki": { icon: "dental-unit", shortTitle: "Скалеры и насадки" },
