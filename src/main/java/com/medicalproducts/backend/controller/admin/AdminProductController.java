@@ -72,6 +72,12 @@ public class AdminProductController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Очистить корзину — удалить все товары навсегда")
+    @DeleteMapping("/trash")
+    public ResponseEntity<Map<String, Integer>> emptyTrash() {
+        return ResponseEntity.ok(Map.of("deleted", productService.emptyTrash()));
+    }
+
     @Operation(summary = "Загрузить изображение товара")
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {

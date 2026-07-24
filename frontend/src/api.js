@@ -102,6 +102,7 @@ export const api = {
     getTrash: () => request("/api/admin/products/trash"),
     restoreProduct: (id) => request(`/api/admin/products/trash/${id}/restore`, { method: "POST" }),
     deleteProductPermanently: (id) => request(`/api/admin/products/trash/${id}`, { method: "DELETE" }),
+    emptyTrash: () => request("/api/admin/products/trash", { method: "DELETE" }),
     importProducts: (file) => {
       const fd = new FormData();
       fd.append("file", file);

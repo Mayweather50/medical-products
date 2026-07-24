@@ -11,6 +11,7 @@ export default function AdminTrash() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [confirmPerm, setConfirmPerm] = useState(null);
+  const [confirmEmpty, setConfirmEmpty] = useState(false);
 
   const load = () => {
     setLoading(true);
@@ -44,10 +45,26 @@ export default function AdminTrash() {
     }
   };
 
+  const doEmptyTrash = async () => {
+    setConfirmEmpty(false);
+    try {
+      const res = await api.admin.emptyTrash();
+      toast.success(`Корзина очищена: удалено ${res?.deleted ?? items.length}`);
+      setItems([]);
+    } catch (err) {
+      toast.error("Не удалось очистить корзину: " + err.message);
+    }
+  };
+
   return (
     <section>
       <div className="admin__head">
         <h2>Корзина {!loading && <small>({items.length})</small>}</h2>
+        {!loading && items.length > 0 && (
+          <Button variant="accent" size="sm" onClick={() => setConfirmEmpty(true)}>
+            Удалить всё
+          </Button>
+        )}
       </div>
 
       {loading ? (
@@ -90,6 +107,16 @@ export default function AdminTrash() {
         danger
         onConfirm={doDeletePermanently}
         onCancel={() => setConfirmPerm(null)}
+      />
+
+      <ConfirmModal
+        open={confirmEmpty}
+        title="Очистить корзину?"
+        message={`Все товары в корзине (${items.length}) будут удалены безвозвратно. Это действие нельзя отменить.`}
+        confirmLabel="Удалить всё"
+        danger
+        onConfirm={doEmptyTrash}
+        onCancel={() => setConfirmEmpty(false)}
       />
     </section>
   );

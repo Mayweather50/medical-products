@@ -138,6 +138,15 @@ public class ProductService {
         log.info("Product permanently deleted: id={}, title='{}'", id, product.getTitle());
     }
 
+    /** Очищает корзину: безвозвратно удаляет все мягко-удалённые товары. Возвращает их число. */
+    @Transactional
+    public int emptyTrash() {
+        List<Product> deleted = productRepository.findDeleted();
+        productRepository.deleteAll(deleted);
+        log.info("Trash emptied: {} product(s) permanently deleted", deleted.size());
+        return deleted.size();
+    }
+
     private Product findById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product with id " + id + " not found"));
