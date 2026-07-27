@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Button from "./Button";
+import ConsentCheckbox from "./ConsentCheckbox";
 import ProductImage from "./ProductImage";
 import { Icon } from "./Icon";
 import { api } from "../api";
@@ -23,6 +24,7 @@ function formatPhone(value) {
 
 export default function LeadModal({ open, onClose, product }) {
   const [form, setForm] = useState(EMPTY_FORM);
+  const [consent, setConsent] = useState(false);
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState(null);
   const [sending, setSending] = useState(false);
@@ -35,6 +37,7 @@ export default function LeadModal({ open, onClose, product }) {
       setErrors({});
       setSubmitError(null);
       setForm(EMPTY_FORM);
+      setConsent(false);
       setTimeout(() => firstRef.current && firstRef.current.focus(), 60);
     }
   }, [open, product]);
@@ -59,6 +62,7 @@ export default function LeadModal({ open, onClose, product }) {
     else if (digits.length < 10) er.phone = "Проверьте номер телефона";
     if (form.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email))
       er.email = "Проверьте e-mail";
+    if (!consent) er.consent = "Требуется согласие на обработку персональных данных";
     setErrors(er);
     return Object.keys(er).length === 0;
   };
@@ -194,6 +198,15 @@ export default function LeadModal({ open, onClose, product }) {
                 />
               </label>
 
+              <ConsentCheckbox
+                checked={consent}
+                onChange={(v) => {
+                  setConsent(v);
+                  if (v) setErrors((er) => ({ ...er, consent: undefined }));
+                }}
+                error={errors.consent}
+              />
+
               {submitError && <div className="lead-form__error">{submitError}</div>}
 
               <Button
@@ -206,9 +219,6 @@ export default function LeadModal({ open, onClose, product }) {
               >
                 {sending ? "Отправляем…" : "Отправить заявку"}
               </Button>
-              <p className="lead-form__note">
-                Нажимая кнопку, вы соглашаетесь с обработкой персональных данных.
-              </p>
             </form>
           </>
         )}

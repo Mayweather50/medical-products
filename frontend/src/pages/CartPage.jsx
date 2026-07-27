@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Breadcrumbs from "../components/Breadcrumbs";
 import Button from "../components/Button";
+import ConsentCheckbox from "../components/ConsentCheckbox";
 import ProductImage from "../components/ProductImage";
 import { Icon } from "../components/Icon";
 import { api } from "../api";
@@ -29,6 +30,7 @@ export default function CartPage() {
   const cart = useCart();
 
   const [form, setForm] = useState(EMPTY_FORM);
+  const [consent, setConsent] = useState(false);
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState(null);
   const [sending, setSending] = useState(false);
@@ -42,6 +44,7 @@ export default function CartPage() {
     const digits = form.phone.replace(/\D/g, "");
     if (!form.phone.trim()) er.phone = "Укажите телефон";
     else if (digits.length < 10) er.phone = "Проверьте номер телефона";
+    if (!consent) er.consent = "Требуется согласие на обработку персональных данных";
     setErrors(er);
     return Object.keys(er).length === 0;
   };
@@ -192,6 +195,15 @@ export default function CartPage() {
                 />
               </label>
 
+              <ConsentCheckbox
+                checked={consent}
+                onChange={(v) => {
+                  setConsent(v);
+                  if (v) setErrors((er) => ({ ...er, consent: undefined }));
+                }}
+                error={errors.consent}
+              />
+
               {submitError && <div className="lead-form__error">{submitError}</div>}
 
               <Button
@@ -204,9 +216,6 @@ export default function CartPage() {
               >
                 {sending ? "Оформляем…" : "Оформить заказ"}
               </Button>
-              <p className="lead-form__note">
-                Нажимая кнопку, вы соглашаетесь с обработкой персональных данных.
-              </p>
             </form>
           </aside>
         </div>
