@@ -62,7 +62,7 @@ class ProductServiceTest {
 
         productResponse = new ProductResponse(1L, "Test Product", "test-product", "ART-001",
                 "Short desc", "Full desc", new BigDecimal("100.00"), false,
-                null, null, Map.of(), true, false, Instant.now(), Instant.now());
+                null, null, null, Map.of(), true, false, Instant.now(), Instant.now());
     }
 
     @Test
@@ -88,7 +88,7 @@ class ProductServiceTest {
     @Test
     void create_validRequest_createsProduct() {
         ProductRequest request = new ProductRequest("New Product", "new-product", "ART-002",
-                "Short", "Full", new BigDecimal("50.00"), false, null, 1L,
+                "Short", "Full", new BigDecimal("50.00"), false, null, null, 1L,
                 Map.of(), true, false);
 
         when(productRepository.existsBySlug("new-product")).thenReturn(false);
@@ -106,7 +106,7 @@ class ProductServiceTest {
     @Test
     void create_duplicateSlug_throwsException() {
         ProductRequest request = new ProductRequest("Product", "existing-slug", "ART",
-                null, null, new BigDecimal("10.00"), false, null, 1L,
+                null, null, new BigDecimal("10.00"), false, null, null, 1L,
                 null, null, null);
 
         when(productRepository.existsBySlug("existing-slug")).thenReturn(true);

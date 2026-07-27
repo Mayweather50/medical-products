@@ -781,7 +781,7 @@ img { max-width: 100%; display: block; }
 .site-foot__cta { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding-block: 50px; border-bottom: 1px solid rgba(255,255,255,0.08); flex-wrap: wrap; }
 .site-foot__cta h2 { font-size: clamp(24px, 2.8vw, 36px); color: #fff; letter-spacing: -0.035em; }
 .site-foot__cta p { font-size: 15px; margin-top: 10px; max-width: 56ch; color: rgba(255,255,255,0.6); }
-.site-foot__grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 40px; padding-block: 52px; }
+.site-foot__grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1.2fr; gap: 40px; padding-block: 52px; }
 .brand--foot .brand__mark { width: 36px; height: 36px; }
 .brand--foot .brand__name { color: #fff; font-size: 20px; }
 .site-foot__brandcol p { font-size: 14px; margin: 16px 0 20px; max-width: 42ch; color: rgba(255,255,255,0.55); line-height: 1.6; }
@@ -1592,3 +1592,193 @@ body {
 .mobile-menu__sub { list-style: none; margin: 4px 0 8px; padding: 0 0 0 46px; display: flex; flex-direction: column; gap: 1px; }
 .mobile-menu__sub a { display: block; padding: 6px 8px; font-size: 13px; color: var(--graphite); border-radius: 7px; }
 .mobile-menu__sub a:active { background: var(--accent-soft); }
+
+/* ============================================================
+   ФИНАЛЬНЫЙ АДАПТИВ — полная мобильная доводка.
+   Убираем горизонтальный сдвиг при пинч-зуме, сворачиваем футер,
+   доводим планшет / телефон / узкий телефон.
+   ============================================================ */
+
+/* ── 1. Защита от горизонтального выхода за вьюпорт ──
+   overflow-x: clip не создаёт scroll-контейнер → sticky-шапка
+   и sticky-сайдбары продолжают работать. */
+html, body { overflow-x: clip; }
+#app { overflow-x: clip; width: 100%; }
+/* элементы, которые чаще всего «распирают» ширину */
+img, svg, video, table, pre { max-width: 100%; }
+.wrap { overflow-wrap: break-word; }
+
+/* ── 2. Футер: сворачиваем колонки (раньше 1.6fr 1fr 1fr не сворачивался) ── */
+@media (max-width: 860px) {
+  .site-foot__grid { grid-template-columns: 1fr 1fr; gap: 30px 32px; }
+  .site-foot__brandcol { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .site-foot__grid { grid-template-columns: 1fr; gap: 26px; padding-block: 40px; }
+  .site-foot__cta { flex-direction: column; align-items: flex-start; padding-block: 38px; }
+  .site-foot__bottom-in { flex-direction: column; gap: 8px; }
+}
+
+/* ── 3. Заголовки секций аккуратно переносятся ── */
+@media (max-width: 720px) {
+  .section__head { flex-direction: column; align-items: flex-start; gap: 14px; margin-bottom: 28px; }
+  .section__head--center { align-items: center; }
+  .section__sub { max-width: none; }
+  .cliniq-hero { padding: 24px 18px; }
+  .cliniq-hero__pic.prod-img, .prod-gallery { max-width: none; }
+  .cliniq-buy { padding: 22px; gap: 20px; }
+  .cliniq-buy__price b { font-size: 30px; }
+  .cliniq-panel { padding: 22px 18px; }
+}
+
+/* ── 4. Каталог-бар: поиск не схлопывается в ноль, контролы переносятся ── */
+@media (max-width: 720px) {
+  .catalog-bar { flex-wrap: wrap; }
+  .catalog-search { flex: 1 1 100%; min-width: 0; order: -1; }
+  .catalog-bar__right { flex: 1 1 auto; justify-content: space-between; }
+  .select select { width: 100%; }
+  .catalog-top { padding-block: 24px 18px; }
+}
+
+/* ── 5. Узкий телефон (≤560): плотнее сетки и типографика ── */
+@media (max-width: 560px) {
+  .prod-grid, .prod-grid--cat { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .card { padding: 10px; border-radius: var(--r); }
+  .card__title { font-size: 15px; }
+  .card__foot { margin-top: 12px; padding-top: 11px; }
+  .card__price-val { font-size: 17px; }
+  .card__cta { width: 38px; height: 38px; }
+
+  .cliniq-hero__title { font-size: clamp(24px, 7vw, 34px); }
+  .cliniq-chips { gap: 8px; }
+  .cliniq-chip { flex: 1 1 calc(50% - 4px); min-width: 0; padding: 12px; }
+  .cliniq-actions { width: 100%; }
+  .cliniq-actions .cliniq-action:not(.cliniq-action--round) { flex: 1; }
+
+  .catalog-title { font-size: clamp(26px, 8vw, 34px); }
+
+  /* модалка ближе к краям + меньше внутренний отступ */
+  .modal-overlay { padding: 14px; }
+  .modal { padding: 24px 20px; border-radius: var(--r-xl); }
+  .modal__head h3 { font-size: 21px; }
+
+  /* корзина: суммарная карточка не прилипает */
+  .cart-summary { padding: 18px; }
+}
+
+/* ── 6. Совсем узкие экраны (≤400): каталог в одну колонку ── */
+@media (max-width: 400px) {
+  .prod-grid, .prod-grid--cat { grid-template-columns: 1fr; }
+  .prow { grid-template-columns: 72px 1fr; gap: 12px; padding: 12px; }
+  .prow__img { width: 72px; }
+}
+
+/* ── 7. Мегаменю: колонки 264px + minmax(420px) = ~706px не влезали
+   в 94vw на 681–750px (нав скрывается только с 680px) ── */
+/* до 1100px меню, привязанное к кнопке «Каталог» (left:0 + до 880px),
+   вылезало за правый край — перевешиваем его на .head-bar (position:relative) */
+@media (max-width: 1100px) {
+  .head-cat-wrap { position: static; }
+  .megamenu { left: var(--gut); right: var(--gut); width: auto; }
+}
+@media (max-width: 900px) {
+  .megamenu { grid-template-columns: 240px minmax(0, 1fr); }
+  .megamenu__sub { columns: 1; }
+}
+@media (max-width: 780px) {
+  .megamenu { grid-template-columns: minmax(0, 1fr); }
+  .megamenu__cats { border-right: none; border-bottom: 1px solid var(--line); padding-right: 0; padding-bottom: 8px; }
+  .megamenu__panel { padding: 12px 6px 6px; min-height: 0; }
+}
+
+/* ── 8. Тач-устройства: убираем hover-«прыжки», которые на тапе залипают ── */
+@media (hover: none) {
+  .card:hover, .prow:hover, .cat-card:hover, .cliniq-rcard:hover,
+  .btn--primary:hover, .btn--light:hover { transform: none; }
+}
+
+/* ============================================================
+   ЮРИДИЧЕСКИЕ СТРАНИЦЫ, СОГЛАСИЯ И COOKIE-БАННЕР
+   ============================================================ */
+
+/* ── Страницы /privacy, /cookie, /terms ── */
+.legal { padding-block: 28px 72px; max-width: 900px; }
+.legal__head { margin: 18px 0 34px; padding-bottom: 26px; border-bottom: 1px solid var(--line); }
+.legal__title { font-size: clamp(26px, 3.4vw, 40px); letter-spacing: -0.035em; color: var(--ink); }
+.legal__lead { margin-top: 14px; font-size: 15.5px; line-height: 1.65; color: var(--graphite); max-width: 68ch; }
+.legal__meta { margin-top: 16px; font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--steel); }
+
+.legal__body { font-size: 15px; line-height: 1.72; color: var(--ink-soft); }
+.legal__body h2 { margin: 38px 0 14px; font-size: 19px; letter-spacing: -0.02em; color: var(--ink); }
+.legal__body h2:first-child { margin-top: 0; }
+.legal__body p { margin-bottom: 14px; max-width: 74ch; }
+.legal__body ul { margin: 0 0 18px; padding-left: 22px; max-width: 74ch; }
+.legal__body li { margin-bottom: 8px; }
+.legal__body a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.legal__body a:hover { color: var(--accent-deep); }
+.legal__body b { color: var(--ink); font-weight: 600; }
+
+/* Таблица cookie — на узких экранах скроллится внутри себя, а не рвёт страницу */
+.legal__body table { width: 100%; margin: 4px 0 20px; border-collapse: collapse; font-size: 14px; display: block; overflow-x: auto; }
+.legal__body th, .legal__body td { border: 1px solid var(--line); padding: 10px 13px; text-align: left; vertical-align: top; }
+.legal__body th { background: var(--accent-pale); font-weight: 600; color: var(--ink); white-space: nowrap; }
+
+.legal__nav { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 44px; padding-top: 24px; border-top: 1px solid var(--line); }
+.legal__nav a { font-size: 13.5px; color: var(--steel); transition: color 0.13s ease; }
+.legal__nav a:hover { color: var(--accent); }
+
+/* ── Чекбокс согласия на обработку ПДн в формах ── */
+.consent { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: start; }
+.consent input { width: 17px; height: 17px; margin-top: 2px; accent-color: var(--accent); flex: none; cursor: pointer; }
+.consent__text { font-size: 12.5px; line-height: 1.5; color: var(--steel); cursor: pointer; }
+.consent__text a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.consent--err .consent__text { color: var(--graphite); }
+.consent--err input { outline: 2px solid #c4503a; outline-offset: 2px; }
+.consent__err { grid-column: 2; }
+
+/* ── Баннер согласия на cookie ── */
+/* z-index 60: выше контента и шапки (40), но ниже off-canvas фильтров (70),
+   модалки заявки (100) и тостов (200) — иначе баннер перекрывает их кнопки */
+.cookie-banner { position: fixed; z-index: 60; left: 0; right: 0; bottom: 0; padding: 14px; animation: cookie-up 0.28s ease; }
+@keyframes cookie-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.cookie-banner__in {
+  max-width: 1100px; margin: 0 auto;
+  display: flex; align-items: center; gap: 26px;
+  padding: 18px 22px;
+  background: var(--glass); backdrop-filter: blur(18px);
+  border: 1px solid var(--glass-border); border-radius: var(--r);
+  box-shadow: var(--sh-lg);
+}
+.cookie-banner__text b { display: block; font-size: 14.5px; color: var(--ink); margin-bottom: 5px; }
+.cookie-banner__text p { font-size: 13px; line-height: 1.55; color: var(--graphite); max-width: 78ch; }
+.cookie-banner__text a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.cookie-banner__actions { display: flex; gap: 10px; flex: none; }
+
+@media (max-width: 860px) {
+  .cookie-banner__in { flex-direction: column; align-items: stretch; gap: 16px; }
+  .cookie-banner__actions { flex-wrap: wrap; }
+  .cookie-banner__actions .btn { flex: 1 1 auto; justify-content: center; }
+}
+@media (max-width: 560px) {
+  .legal { padding-block: 20px 56px; }
+  .legal__body { font-size: 14.5px; }
+  .legal__body h2 { font-size: 17px; margin-top: 30px; }
+  .legal__nav { flex-direction: column; gap: 12px; }
+  .cookie-banner { padding: 10px; }
+  .cookie-banner__in { padding: 16px; }
+  .cookie-banner__actions { flex-direction: column; }
+}
+
+/* ── Страница настроек в админке ── */
+.admin-settings { display: flex; flex-direction: column; gap: 26px; max-width: 760px; }
+.admin-settings__group { border: 1px solid var(--line); border-radius: var(--r); padding: 20px 22px 22px; }
+.admin-settings__group legend { padding: 0 8px; font-family: var(--mono); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); }
+.admin-settings__hint { font-size: 12.5px; line-height: 1.5; color: var(--steel); margin-bottom: 16px; }
+.admin-settings__fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.admin-settings__fields .field:has(textarea) { grid-column: 1 / -1; }
+.admin-settings__foot { position: sticky; bottom: 0; padding: 14px 0; background: linear-gradient(to top, var(--sheet, #fff) 60%, transparent); }
+
+@media (max-width: 700px) {
+  .admin-settings__fields { grid-template-columns: 1fr; }
+  .admin-settings__group { padding: 16px 14px 18px; }
+}

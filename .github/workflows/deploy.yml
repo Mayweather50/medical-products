@@ -1,0 +1,182 @@
+name: Deploy to production
+
+# Запускается кнопкой во вкладке Actions. Автодеплой по push намеренно
+# закомментирован: на прод лучше выкатывать осознанно.
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [main]
+
+# Два деплоя одновременно раскатают друг друга — очередь вместо гонки.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  REMOTE_DIR: /opt/medkor
+  # Staging-каталог сборки. Namely: всё, из чего собираются образы, приезжает
+  # сюда из репозитория на каждый деплой. Старые /opt/medkor/{backend,frontend}
+  # и /opt/medkor/{be,fe}-build не используются — там протухшие файлы.
+  BUILD_DIR: /opt/medkor/build
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+          cache: maven
+
+      - name: Build backend
+        run: mvn -B -DskipTests package
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      # Всё, что нужно для сборки образов на сервере, готовим здесь:
+      # артефакты + nginx.conf из репозитория + runtime-Dockerfile'ы.
+      # Репозиторные Dockerfile'ы многостадийные (собирают из исходников) —
+      # на сервере пересобирать нечего, поэтому нужны runtime-only.
+      - name: Pack artifacts
+        run: |
+          mkdir -p stage
+          cp target/*.jar stage/app.jar
+          tar -czf stage/dist.tar.gz -C frontend dist
+          cp frontend/nginx.conf stage/nginx.conf
+
+          cat > stage/backend.Dockerfile <<'EOF'
+          FROM eclipse-temurin:21-jre-alpine
+          WORKDIR /app
+          RUN addgroup -S app && adduser -S app -G app \
+           && mkdir -p /app/uploads && chown -R app:app /app
+          USER app
+          COPY --chown=app:app app.jar app.jar
+          EXPOSE 8080
+          ENTRYPOINT ["java", "-jar", "app.jar"]
+          EOF
+
+          cat > stage/frontend.Dockerfile <<'EOF'
+          FROM nginx:1.27-alpine
+          RUN rm -rf /usr/share/nginx/html/*
+          COPY dist /usr/share/nginx/html
+          COPY nginx.conf /etc/nginx/conf.d/default.conf
+          EXPOSE 80
+          EOF
+
+          ls -la stage/
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Upload artifacts
+        env:
+          TARGET: ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}
+        run: |
+          ssh -o BatchMode=yes "$TARGET" "rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR"
+          scp -o BatchMode=yes stage/* "$TARGET:$BUILD_DIR/"
+
+      - name: Backup database
+        env:
+          TARGET: ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}
+        run: |
+          ssh -o BatchMode=yes "$TARGET" bash -s <<'EOF'
+          set -euo pipefail
+          cd /opt/medkor
+          set -a; . ./.env; set +a
+          B="db-backup-$(date +%Y%m%d-%H%M%S).sql"
+          docker compose exec -T postgres pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" > "$B"
+          echo "backup: $B ($(stat -c%s "$B") bytes)"
+          # держим только 10 последних бэкапов
+          ls -1t db-backup-*.sql | tail -n +11 | xargs -r rm --
+          EOF
+
+      # Прошлые образы помечаем :prev — это точка отката. Данные (БД и
+      # картинки) живут в именованных томах medkor_pgdata / medkor_uploads
+      # и пересборку образов переживают.
+      - name: Build images and restart
+        env:
+          TARGET: ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}
+        run: |
+          ssh -o BatchMode=yes "$TARGET" bash -s <<'EOF'
+          set -euo pipefail
+          cd /opt/medkor/build
+
+          for img in medical-products-backend medical-products-frontend; do
+            if docker image inspect "$img:latest" >/dev/null 2>&1; then
+              docker tag "$img:latest" "$img:prev"
+              echo "tagged $img:prev"
+            fi
+          done
+
+          tar -xzf dist.tar.gz
+
+          docker build -q -f backend.Dockerfile  -t medical-products-backend:latest  .
+          docker build -q -f frontend.Dockerfile -t medical-products-frontend:latest .
+
+          cd /opt/medkor
+          docker compose up -d
+          docker image prune -f >/dev/null 2>&1 || true
+          EOF
+
+      - name: Health check
+        env:
+          BASE: http://${{ secrets.DEPLOY_HOST }}:8090
+        run: |
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' -m 5 "$BASE/api/products?size=1" || true)
+            if [ "$code" = "200" ]; then
+              echo "backend ok после $((i*5))s"
+              curl -s -o /dev/null -w 'frontend: %{http_code}\n' -m 10 "$BASE/"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::бэкенд не поднялся за 150 секунд"
+          exit 1
+
+      # Прод не оставляем лежать: возвращаем предыдущие образы.
+      - name: Rollback on failure
+        if: failure()
+        env:
+          TARGET: ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}
+        run: |
+          ssh -o BatchMode=yes "$TARGET" bash -s <<'EOF' || true
+          set -uo pipefail
+          cd /opt/medkor
+          rolled=0
+          for img in medical-products-backend medical-products-frontend; do
+            if docker image inspect "$img:prev" >/dev/null 2>&1; then
+              docker tag "$img:prev" "$img:latest"
+              rolled=1
+            fi
+          done
+          if [ "$rolled" = "1" ]; then
+            docker compose up -d
+            echo "ОТКАТ выполнен: образы :prev возвращены в :latest"
+          else
+            echo "откатывать нечего — образов :prev нет"
+          fi
+          docker compose ps
+          docker compose logs --tail=60 backend
+          EOF
