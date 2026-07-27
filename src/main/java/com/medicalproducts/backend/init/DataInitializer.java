@@ -52,15 +52,20 @@ public class DataInitializer implements CommandLineRunner {
         log.info("Seeding initial categories and products...");
 
         Category stomatEquipment = category("Стоматологическое оборудование", "stomatologicheskoe-oborudovanie",
-                "Стоматологические установки, автоклавы, компрессоры и аспирация");
+                "Стоматологические установки, автоклавы, компрессоры и аспирация",
+                "dental-unit", "Стомат. оборудование");
         Category labEquipment = category("Зуботехническое оборудование", "zubotehnicheskoe-oborudovanie",
-                "Микромоторы, печи, смесители и оснащение зуботехнической лаборатории");
+                "Микромоторы, печи, смесители и оснащение зуботехнической лаборатории",
+                "lab", "Зуботех. оборудование");
         Category xray = category("Рентген оборудование", "rentgen-oborudovanie",
-                "Радиовизиографы, дентальные и панорамные рентген-аппараты");
+                "Радиовизиографы, дентальные и панорамные рентген-аппараты",
+                "diagnostics", "Рентген");
         Category implant = category("Имплантология и хирургия", "implantologiya-i-hirurgiya",
-                "Имплантаты, физиодиспенсеры и хирургический инструмент");
+                "Имплантаты, физиодиспенсеры и хирургический инструмент",
+                "dental-unit", "Имплантология");
         Category anesthesia = category("Анестезия", "anesteziya",
-                "Карпульная анестезия, иглы и аксессуары для обезболивания");
+                "Карпульная анестезия, иглы и аксессуары для обезболивания",
+                "anesthesia", "Анестезия");
 
         categoryRepository.saveAll(java.util.List.of(
                 stomatEquipment, labEquipment, xray, implant, anesthesia));
@@ -169,11 +174,14 @@ public class DataInitializer implements CommandLineRunner {
         return certificate;
     }
 
-    private Category category(String title, String slug, String description) {
+    private Category category(String title, String slug, String description,
+                              String icon, String shortTitle) {
         Category category = new Category();
         category.setTitle(title);
         category.setSlug(slug);
         category.setDescription(description);
+        category.setIcon(icon);
+        category.setShortTitle(shortTitle);
         return category;
     }
 

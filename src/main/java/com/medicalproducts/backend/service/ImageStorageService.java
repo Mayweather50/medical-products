@@ -21,6 +21,11 @@ public class ImageStorageService {
     );
     private static final long MAX_SIZE = 10 * 1024 * 1024; // 10 MB
 
+    /** Сертификаты и декларации чаще всего присылают в PDF, поэтому для них набор шире. */
+    private static final Set<String> ALLOWED_DOCUMENT_TYPES = Set.of(
+            "application/pdf", "image/jpeg", "image/png", "image/webp"
+    );
+
     private final Path uploadDir;
 
     public ImageStorageService(@Value("${app.upload.dir:uploads}") String dir) {
@@ -33,15 +38,26 @@ public class ImageStorageService {
     }
 
     public String store(MultipartFile file) {
+        return save(file, ALLOWED_TYPES,
+                "Only JPEG, PNG, WebP and GIF images are allowed");
+    }
+
+    /** Сертификаты и другие документы: PDF плюс сканы в виде картинок. */
+    public String storeDocument(MultipartFile file) {
+        return save(file, ALLOWED_DOCUMENT_TYPES,
+                "Only PDF, JPEG, PNG and WebP files are allowed");
+    }
+
+    private String save(MultipartFile file, Set<String> allowedTypes, String typeError) {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("File is empty");
         }
         if (file.getSize() > MAX_SIZE) {
-            throw new IllegalArgumentException("File too large (max 5 MB)");
+            throw new IllegalArgumentException("File too large (max 10 MB)");
         }
         String contentType = file.getContentType();
-        if (contentType == null || !ALLOWED_TYPES.contains(contentType)) {
-            throw new IllegalArgumentException("Only JPEG, PNG, WebP and GIF images are allowed");
+        if (contentType == null || !allowedTypes.contains(contentType)) {
+            throw new IllegalArgumentException(typeError);
         }
 
         String ext = extensionFromType(contentType);
@@ -58,7 +74,7 @@ public class ImageStorageService {
             throw new RuntimeException("Failed to save image", e);
         }
 
-        log.info("Image uploaded: {}", filename);
+        log.info("File uploaded: {}", filename);
         return "/uploads/" + filename;
     }
 
@@ -68,6 +84,7 @@ public class ImageStorageService {
             case "image/png" -> ".png";
             case "image/webp" -> ".webp";
             case "image/gif" -> ".gif";
+            case "application/pdf" -> ".pdf";
             default -> ".bin";
         };
     }

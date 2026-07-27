@@ -32,6 +32,12 @@ export default function AdminLayout() {
         <NavLink to="/admin/banners">
           <Icon name="image" size={17} /> Баннеры
         </NavLink>
+        <NavLink to="/admin/certificates">
+          <Icon name="doc" size={17} /> Сертификаты
+        </NavLink>
+        <NavLink to="/admin/settings">
+          <Icon name="headset" size={17} /> Настройки
+        </NavLink>
         <NavLink to="/admin/trash">
           <Icon name="trash" size={17} /> Корзина
         </NavLink>

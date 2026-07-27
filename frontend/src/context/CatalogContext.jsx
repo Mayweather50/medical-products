@@ -1,6 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { api } from "../api";
-import { catMeta } from "../lib/categoryMeta";
 
 /* Категории нужны почти на каждом экране (шапка, подвал, фильтры),
    поэтому грузим их один раз и раздаём через контекст.
@@ -21,7 +20,8 @@ export function CatalogProvider({ children }) {
     api
       .getCategories()
       .then((list) => {
-        const withMeta = list.map((c) => ({ ...c, ...catMeta(c), count: c.productCount }));
+        // icon и shortTitle приходят из БД; здесь только счётчик товаров
+        const withMeta = list.map((c) => ({ ...c, count: c.productCount }));
         // Дерево: категории верхнего уровня (parentId=null) с вложенными children
         const tops = withMeta.filter((c) => !c.parentId);
         tops.forEach((t) => {

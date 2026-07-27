@@ -1,10 +1,10 @@
 import { CatIcon } from "./Icon";
-import { catMeta } from "../lib/categoryMeta";
+import { catIcon } from "../lib/category";
 
 /* Плейсхолдер изображения товара: цветовая схема и иконка категории.
    Если у товара появится imageUrl — показываем настоящую картинку. */
 export default function ProductImage({ product, ratio = "1 / 1", size = 64, className = "" }) {
-  const { icon } = catMeta(product.category);
+  const icon = catIcon(product.category);
 
   if (product.imageUrl) {
     return (

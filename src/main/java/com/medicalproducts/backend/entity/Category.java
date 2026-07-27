@@ -28,8 +28,17 @@ public class Category extends BaseEntity {
     @Column(columnDefinition = "text")
     private String description;
 
+    /** Фото категории (/uploads/...). Может отсутствовать — тогда рисуется иконка. */
     @Column(name = "image_url")
     private String imageUrl;
+
+    /** Имя иконки-заглушки из фронтового набора CAT_ICONS. */
+    @Column(nullable = false, length = 64)
+    private String icon = "clinic";
+
+    /** Короткое название для плиток и карточек товара. */
+    @Column(name = "short_title", nullable = false, length = 120)
+    private String shortTitle;
 
     /** Родительская категория (null — категория верхнего уровня). */
     @ManyToOne(fetch = FetchType.LAZY)

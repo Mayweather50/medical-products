@@ -4,7 +4,7 @@ import Badge from "./Badge";
 import Button from "./Button";
 import ProductImage from "./ProductImage";
 import { fmtPrice } from "../lib/format";
-import { catMeta } from "../lib/categoryMeta";
+import { catShortTitle } from "../lib/category";
 import { useLeadModal } from "../context/LeadModalContext";
 import { useCart } from "../context/CartContext";
 
@@ -20,7 +20,7 @@ export default function ProductRow({ product: p }) {
       <ProductImage product={p} size={40} className="prow__img" />
       <div className="prow__main">
         <div className="prow__cat">
-          {catMeta(p.category).shortTitle} · {p.article}
+          {catShortTitle(p.category)} · {p.article}
         </div>
         <h3 className="prow__title">{p.title}</h3>
         <p className="prow__desc">{p.shortDescription}</p>

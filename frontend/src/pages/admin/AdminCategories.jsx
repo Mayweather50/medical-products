@@ -7,9 +7,15 @@ import { useToast } from "../../components/Toast";
 import { api } from "../../api";
 import { useCatalog } from "../../context/CatalogContext";
 
-const EMPTY_FORM = { title: "", slug: "", description: "", icon: "clinic", photo: "" };
+const EMPTY_FORM = {
+  title: "", slug: "", shortTitle: "", description: "", icon: "clinic", photo: "",
+};
 
 const ICON_OPTIONS = [
+  { key: "dental-unit", label: "Стоматологическая установка" },
+  { key: "cadcam", label: "Cad/Cam, 3D" },
+  { key: "lab", label: "Зуботехническая лаборатория" },
+  { key: "anesthesia", label: "Анестезия" },
   { key: "consumables", label: "Расходные материалы" },
   { key: "ppe", label: "СИЗ / Маска" },
   { key: "diagnostics", label: "Диагностика" },
@@ -30,12 +36,6 @@ const slugify = (s) =>
     }[ch] || ""))
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
-
-function iconFromImageUrl(imageUrl) {
-  if (!imageUrl) return "clinic";
-  if (imageUrl.startsWith("icon:")) return imageUrl.slice(5);
-  return "clinic";
-}
 
 export default function AdminCategories() {
   const toast = useToast();
@@ -76,9 +76,10 @@ export default function AdminCategories() {
       form: {
         title: c.title,
         slug: c.slug,
+        shortTitle: c.shortTitle || "",
         description: c.description || "",
-        icon: iconFromImageUrl(c.imageUrl),
-        photo: c.imageUrl && !c.imageUrl.startsWith("icon:") ? c.imageUrl : "",
+        icon: c.icon || "clinic",
+        photo: c.imageUrl || "",
       },
     });
   };
@@ -95,9 +96,11 @@ export default function AdminCategories() {
     const payload = {
       title: f.title.trim(),
       slug: f.slug.trim(),
+      shortTitle: f.shortTitle.trim() || null,
       description: f.description.trim() || null,
-      // Фото имеет приоритет над иконкой; путь /uploads/... хранится в БД
-      imageUrl: f.photo ? f.photo : "icon:" + f.icon,
+      // фото и иконка теперь независимы: иконка используется, когда фото нет
+      imageUrl: f.photo || null,
+      icon: f.icon,
     };
     try {
       if (editing.category) await api.admin.updateCategory(editing.category.id, payload);
@@ -166,13 +169,18 @@ export default function AdminCategories() {
                 <tr key={c.id}>
                   <td>{c.id}</td>
                   <td>
-                    {c.imageUrl && !c.imageUrl.startsWith("icon:") ? (
+                    {c.imageUrl ? (
                       <img className="admin-cat-thumb" src={c.imageUrl} alt="" />
                     ) : (
-                      <CatIcon name={iconFromImageUrl(c.imageUrl)} size={22} />
+                      <CatIcon name={c.icon || "clinic"} size={22} />
                     )}
                   </td>
-                  <td><b>{c.title}</b></td>
+                  <td>
+                    <b>{c.title}</b>
+                    {c.shortTitle && c.shortTitle !== c.title && (
+                      <div className="admin-table__sub">{c.shortTitle}</div>
+                    )}
+                  </td>
                   <td><code>{c.slug}</code></td>
                   <td className="admin-table__txt">{c.description || "—"}</td>
                   <td className="admin-table__actions">
@@ -231,6 +239,19 @@ export default function AdminCategories() {
                 {err("slug")}
               </label>
 
+              <label className={"field" + (formErrors.shortTitle ? " field--err" : "")}>
+                <span className="field__lbl">
+                  Короткое название <small>(для плиток и карточек товара)</small>
+                </span>
+                <input
+                  type="text"
+                  value={editing.form.shortTitle}
+                  onChange={setF("shortTitle")}
+                  placeholder={editing.form.title || "Совпадает с названием"}
+                />
+                {err("shortTitle")}
+              </label>
+
               <div className={"field" + (formErrors.photo ? " field--err" : "")}>
                 <span className="field__lbl">Фото категории</span>
                 <div className="cat-photo-edit">
@@ -270,7 +291,9 @@ export default function AdminCategories() {
               </div>
 
               <div className="field">
-                <span className="field__lbl">Иконка {editing.form.photo && <small>(используется, если нет фото)</small>}</span>
+                <span className="field__lbl">
+                  Иконка {editing.form.photo && <small>(показывается, если фото не загрузится)</small>}
+                </span>
                 <div className="icon-picker">
                   {ICON_OPTIONS.map((opt) => (
                     <button

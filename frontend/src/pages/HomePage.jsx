@@ -8,37 +8,7 @@ import { api } from "../api";
 import { catalogUrl, plural } from "../lib/format";
 import { useCatalog } from "../context/CatalogContext";
 import { useLeadModal } from "../context/LeadModalContext";
-
-/* Показываем, пока баннеры не загрузились и если из админки не пришло ни одного. */
-const FALLBACK_SLIDES = [
-  {
-    id: "banner-1",
-    tone: "teal",
-    img: "/banners/banner-1.jpg",
-    eyebrow: "Каталог",
-    title: "Оборудование и материалы для стоматологии",
-    cta: "Открыть каталог",
-    to: "/catalog",
-  },
-  {
-    id: "banner-2",
-    tone: "deep",
-    img: "/banners/banner-2.jpg",
-    eyebrow: "Цифровая стоматология",
-    title: "Cad/Cam технологии: сканеры и фрезерные станки",
-    cta: "Смотреть раздел",
-    to: catalogUrl({ cat: "cad-cam-tehnologii" }),
-  },
-  {
-    id: "banner-3",
-    tone: "azure",
-    img: "/banners/banner-3.jpg",
-    eyebrow: "Под ключ",
-    title: "Оснащение стоматологического кабинета",
-    cta: "Смотреть оборудование",
-    to: catalogUrl({ cat: "stomatologicheskoe-oborudovanie" }),
-  },
-];
+import { useSettings } from "../context/SettingsContext";
 
 /* Слайд из админки → форма, которую рисует Hero. */
 function toSlide(b) {
@@ -55,33 +25,38 @@ function toSlide(b) {
 
 function Hero() {
   const navigate = useNavigate();
-  const [slides, setSlides] = useState(FALLBACK_SLIDES);
+  const [slides, setSlides] = useState(null);
   const [active, setActive] = useState(0);
   const timer = useRef(null);
 
-  /* Баннеры редактируются в админке; при ошибке остаются запасные. */
+  /* Баннеры целиком приходят из админки. Пока не загрузились — slides === null,
+     блок не рисуем; если админ не создал ни одного — тоже не рисуем. */
   useEffect(() => {
     let cancelled = false;
     api.getBanners()
       .then((list) => {
-        if (!cancelled && list?.length) {
-          setSlides(list.map(toSlide));
+        if (!cancelled) {
+          setSlides((list || []).map(toSlide));
           setActive(0);
         }
       })
-      .catch(() => {});
+      .catch(() => { if (!cancelled) setSlides([]); });
     return () => { cancelled = true; };
   }, []);
 
-  const go = (i) => setActive((i + slides.length) % slides.length);
+  const count = slides?.length ?? 0;
 
   /* Автолистание с паузой при наведении */
+  const stop = () => { if (timer.current) clearInterval(timer.current); };
   const start = () => {
     stop();
-    timer.current = setInterval(() => setActive((a) => (a + 1) % slides.length), 6000);
+    if (count > 1) timer.current = setInterval(() => setActive((a) => (a + 1) % count), 6000);
   };
-  const stop = () => { if (timer.current) clearInterval(timer.current); };
-  useEffect(() => { start(); return stop; }, [slides.length]);
+  useEffect(() => { start(); return stop; }, [count]);
+
+  if (!count) return null;
+
+  const go = (i) => setActive((i + count) % count);
 
   return (
     <section
@@ -115,41 +90,47 @@ function Hero() {
         ))}
       </div>
 
-      <button
-        className="mc-banner__arrow mc-banner__arrow--prev"
-        type="button"
-        aria-label="Предыдущий слайд"
-        onClick={() => go(active - 1)}
-      >
-        <Icon name="arrow" size={22} />
-      </button>
-      <button
-        className="mc-banner__arrow mc-banner__arrow--next"
-        type="button"
-        aria-label="Следующий слайд"
-        onClick={() => go(active + 1)}
-      >
-        <Icon name="arrow" size={22} />
-      </button>
-
-      <div className="mc-banner__dots" role="tablist">
-        {slides.map((s, i) => (
+      {/* стрелки и точки не нужны, если слайд один */}
+      {count > 1 && (
+        <>
           <button
-            key={s.id}
+            className="mc-banner__arrow mc-banner__arrow--prev"
             type="button"
-            className={"mc-banner__dot" + (i === active ? " is-active" : "")}
-            aria-label={`Слайд ${i + 1}`}
-            aria-selected={i === active}
-            onClick={() => go(i)}
-          />
-        ))}
-      </div>
+            aria-label="Предыдущий слайд"
+            onClick={() => go(active - 1)}
+          >
+            <Icon name="arrow" size={22} />
+          </button>
+          <button
+            className="mc-banner__arrow mc-banner__arrow--next"
+            type="button"
+            aria-label="Следующий слайд"
+            onClick={() => go(active + 1)}
+          >
+            <Icon name="arrow" size={22} />
+          </button>
+
+          <div className="mc-banner__dots" role="tablist">
+            {slides.map((s, i) => (
+              <button
+                key={s.id}
+                type="button"
+                className={"mc-banner__dot" + (i === active ? " is-active" : "")}
+                aria-label={`Слайд ${i + 1}`}
+                aria-selected={i === active}
+                onClick={() => go(i)}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </section>
   );
 }
 
 function CategoryCard({ c }) {
-  const photo = c.imageUrl && !c.imageUrl.startsWith("icon:") ? c.imageUrl : null;
+  // imageUrl теперь хранит только настоящее фото, иконка лежит в отдельном поле
+  const photo = c.imageUrl || null;
   const [showPhoto, setShowPhoto] = useState(Boolean(photo));
 
   return (
@@ -186,15 +167,18 @@ function CategoryCard({ c }) {
 
 function Categories() {
   const { categories, loading } = useCatalog();
+  const { settings: s } = useSettings();
 
   return (
     <section className="wrap section" id="categories">
       <div className="section__head">
         <div>
-          <h2 className="section__title">Категории товаров</h2>
-          <p className="section__sub">
-            {categories.length || 8} направлений — от расходников до оснащения клиник под ключ
-          </p>
+          <h2 className="section__title">{s.categories_title}</h2>
+          {s.categories_sub && (
+            <p className="section__sub">
+              {categories.length} {plural(categories.length, ["направление", "направления", "направлений"])} — {s.categories_sub}
+            </p>
+          )}
         </div>
         <Link className="section__more" to="/catalog">
           Весь каталог <Icon name="arrowSm" size={16} />
@@ -215,6 +199,7 @@ function Categories() {
 
 function Popular() {
   const navigate = useNavigate();
+  const { settings: cfg } = useSettings();
   const [state, setState] = useState({ items: [], loading: true, error: null });
   const trackRef = useRef(null);
 
@@ -240,8 +225,8 @@ function Popular() {
       <div className="wrap">
         <div className="section__head">
           <div>
-            <h2 className="section__title">Популярные товары</h2>
-            <p className="section__sub">Чаще всего заказывают клиники и частные покупатели</p>
+            <h2 className="section__title">{cfg.popular_title}</h2>
+            {cfg.popular_sub && <p className="section__sub">{cfg.popular_sub}</p>}
           </div>
           <div className="pop-actions">
             {state.items.length > 1 && (
@@ -283,6 +268,7 @@ function Popular() {
 }
 
 function Certificates() {
+  const { settings: s } = useSettings();
   const [certs, setCerts] = useState([]);
   useEffect(() => {
     api.getCertificates().then(setCerts).catch(() => setCerts([]));
@@ -293,10 +279,8 @@ function Certificates() {
   return (
     <section className="wrap section" id="advantages">
       <div className="section__head section__head--center">
-        <h2 className="section__title" id="certificates">Сертификаты и документы</h2>
-        <p className="section__sub">
-          Вся продукция зарегистрирована и разрешена к применению на территории РФ
-        </p>
+        <h2 className="section__title" id="certificates">{s.certs_title}</h2>
+        {s.certs_sub && <p className="section__sub">{s.certs_sub}</p>}
       </div>
       <div className="adv-grid">
         {certs.map((c) => (

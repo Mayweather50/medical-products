@@ -7,6 +7,8 @@ package com.medicalproducts.backend.dto;
 public record CategorySummaryResponse(
         Long id,
         String title,
-        String slug
+        String slug,
+        String icon,
+        String shortTitle
 ) {
 }

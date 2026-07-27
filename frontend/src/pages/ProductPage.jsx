@@ -8,7 +8,7 @@ import { Icon } from "../components/Icon";
 import { Loading, LoadError } from "../components/StateBlock";
 import { api } from "../api";
 import { catalogUrl, fmtPrice } from "../lib/format";
-import { catMeta } from "../lib/categoryMeta";
+import { catShortTitle } from "../lib/category";
 import { useLeadModal } from "../context/LeadModalContext";
 import { useCart } from "../context/CartContext";
 import { usePageTitle } from "../lib/usePageTitle";
@@ -66,7 +66,7 @@ export default function ProductPage() {
     return <LoadError error={state.error} retry={load} />;
   }
 
-  const meta = catMeta(p.category);
+
   const chars = Object.entries(p.characteristics || {});
 
   const addToCart = () => {
@@ -89,7 +89,7 @@ export default function ProductPage() {
         <Breadcrumbs
           items={[
             { label: "Главная", to: "/" },
-            { label: meta.shortTitle, to: catalogUrl({ cat: p.category.slug }) },
+            { label: catShortTitle(p.category), to: catalogUrl({ cat: p.category.slug }) },
             { label: p.title },
           ]}
         />
@@ -246,7 +246,7 @@ export default function ProductPage() {
             </div>
             <div className="cliniq-related">
               {related.map((r) => {
-                const rm = catMeta(r.category);
+                const rm = catShortTitle(r.category);
                 return (
                   <button
                     key={r.id}
@@ -254,7 +254,7 @@ export default function ProductPage() {
                     onClick={() => navigate(`/product/${r.slug}`)}
                   >
                     <div className="cliniq-rcard__top">
-                      <span className="cliniq-rcard__cat">{rm.shortTitle}</span>
+                      <span className="cliniq-rcard__cat">{rm}</span>
                       <h3>{r.title}</h3>
                     </div>
                     <div className="cliniq-rcard__bot">

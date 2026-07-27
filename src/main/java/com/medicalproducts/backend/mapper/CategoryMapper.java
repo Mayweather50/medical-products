@@ -26,6 +26,8 @@ public class CategoryMapper {
                 category.getSlug(),
                 category.getDescription(),
                 category.getImageUrl(),
+                category.getIcon(),
+                category.getShortTitle(),
                 category.getParent() != null ? category.getParent().getId() : null,
                 productCount,
                 category.getCreatedAt(),
@@ -37,7 +39,9 @@ public class CategoryMapper {
         return new CategorySummaryResponse(
                 category.getId(),
                 category.getTitle(),
-                category.getSlug()
+                category.getSlug(),
+                category.getIcon(),
+                category.getShortTitle()
         );
     }
 
@@ -46,5 +50,18 @@ public class CategoryMapper {
         category.setSlug(request.slug());
         category.setDescription(request.description());
         category.setImageUrl(request.imageUrl());
+
+        // icon и shortTitle необязательны: пустое значение не затирает уже сохранённое
+        if (hasText(request.icon())) {
+            category.setIcon(request.icon());
+        } else if (!hasText(category.getIcon())) {
+            category.setIcon("clinic");
+        }
+
+        category.setShortTitle(hasText(request.shortTitle()) ? request.shortTitle() : request.title());
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 }

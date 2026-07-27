@@ -48,7 +48,7 @@ class CategoryServiceTest {
         category.setUpdatedAt(Instant.now());
 
         categoryResponse = new CategoryResponse(1L, "Test Category", "test-category",
-                null, null, null, 0L, Instant.now(), Instant.now());
+                null, null, "clinic", "Test Category", null, 0L, Instant.now(), Instant.now());
     }
 
     @Test
@@ -72,7 +72,7 @@ class CategoryServiceTest {
 
     @Test
     void create_duplicateSlug_throwsException() {
-        CategoryRequest request = new CategoryRequest("Cat", "existing", null, null, null);
+        CategoryRequest request = new CategoryRequest("Cat", "existing", null, null, null, null, null);
         when(categoryRepository.existsBySlug("existing")).thenReturn(true);
 
         assertThatThrownBy(() -> categoryService.create(request))

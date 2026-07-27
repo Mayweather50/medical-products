@@ -1,6 +1,7 @@
 package com.medicalproducts.backend.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 public record CertificateRequest(
 
@@ -9,8 +10,11 @@ public record CertificateRequest(
 
         String description,
 
+        /* Либо внешняя ссылка, либо путь на этом же сайте (/uploads/...),
+           который возвращает загрузчик файлов. */
         @NotBlank(message = "fileUrl is required")
-        @org.hibernate.validator.constraints.URL(message = "fileUrl must be a valid URL")
+        @Pattern(regexp = "^(https?://\\S+|/\\S*)$",
+                message = "fileUrl must be an http(s) link or a site path starting with /")
         String fileUrl
 ) {
 }

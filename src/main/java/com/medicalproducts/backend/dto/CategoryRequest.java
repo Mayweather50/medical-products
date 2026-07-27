@@ -17,6 +17,12 @@ public record CategoryRequest(
 
         String imageUrl,
 
+        /** Имя иконки-заглушки; если не передано — остаётся прежняя (по умолчанию clinic). */
+        String icon,
+
+        /** Короткое название для плиток; если не передано — берётся полное. */
+        String shortTitle,
+
         Long parentId
 ) {
 }

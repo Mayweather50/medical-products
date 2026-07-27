@@ -67,6 +67,9 @@ export const api = {
   /** Активные слайды баннера главной страницы */
   getBanners: () => request("/api/banners"),
 
+  /** Контакты, реквизиты и тексты сайта: { key: value } */
+  getSettings: () => request("/api/settings"),
+
   /** POST /api/leads: { name, phone, email?, comment?, productName? } */
   createLead: (payload) =>
     request("/api/leads", { method: "POST", body: JSON.stringify(payload) }),
@@ -131,5 +134,22 @@ export const api = {
       fd.append("file", file);
       return request("/api/admin/banners/upload-image", { method: "POST", body: fd });
     },
+
+    getCertificates: () => request("/api/admin/certificates"),
+    createCertificate: (payload) =>
+      request("/api/admin/certificates", { method: "POST", body: JSON.stringify(payload) }),
+    updateCertificate: (id, payload) =>
+      request(`/api/admin/certificates/${id}`, { method: "PUT", body: JSON.stringify(payload) }),
+    deleteCertificate: (id) =>
+      request(`/api/admin/certificates/${id}`, { method: "DELETE" }),
+    uploadCertificateFile: (file) => {
+      const fd = new FormData();
+      fd.append("file", file);
+      return request("/api/admin/certificates/upload-file", { method: "POST", body: fd });
+    },
+
+    getSettings: () => request("/api/admin/settings"),
+    updateSettings: (values) =>
+      request("/api/admin/settings", { method: "PUT", body: JSON.stringify(values) }),
   },
 };

@@ -4,7 +4,7 @@ import Badge from "./Badge";
 import ProductImage from "./ProductImage";
 import { Icon } from "./Icon";
 import { fmtPrice } from "../lib/format";
-import { catMeta } from "../lib/categoryMeta";
+import { catShortTitle } from "../lib/category";
 import { useLeadModal } from "../context/LeadModalContext";
 import { useCart } from "../context/CartContext";
 
@@ -45,7 +45,7 @@ export default function ProductCard({ product: p }) {
         </div>
       </div>
       <div className="card__body">
-        <div className="card__cat">{catMeta(p.category).shortTitle}</div>
+        <div className="card__cat">{catShortTitle(p.category)}</div>
         <h3 className="card__title">{p.title}</h3>
         <p className="card__desc">{p.shortDescription}</p>
       </div>
