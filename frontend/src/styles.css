@@ -249,14 +249,21 @@ img { max-width: 100%; display: block; }
   border-radius: 0;
   transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, border-radius 0.3s ease, backdrop-filter 0.3s ease;
 }
-/* при скролле — плотнее матовое стекло + тень */
+/* при скролле — прозрачнее, но сильнее размытие: контент под плашкой
+   просвечивает. brightness подсвечивает подложку — без него тёмная картинка
+   баннера съедала контраст левой навигации */
 .site-head.is-scrolled .head-bar {
-  background: color-mix(in oklab, var(--accent) 9%, rgba(255,255,255,0.62));
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
-  backdrop-filter: blur(28px) saturate(190%);
-  border-color: transparent;
+  background: color-mix(in oklab, var(--accent) 8%, rgba(255,255,255,0.34));
+  -webkit-backdrop-filter: blur(34px) saturate(190%) brightness(1.22);
+  backdrop-filter: blur(34px) saturate(190%) brightness(1.22);
+  border-color: rgba(255,255,255,0.5);
   border-radius: var(--r-lg);
-  box-shadow: 0 12px 34px -18px rgba(13,76,94,0.38), 0 1px 0 rgba(255,255,255,0.55) inset;
+  box-shadow: 0 14px 38px -22px rgba(13,76,94,0.3), 0 1px 0 rgba(255,255,255,0.6) inset;
+}
+/* без backdrop-filter полупрозрачная плашка нечитаема — возвращаем плотный фон */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .head-bar,
+  .site-head.is-scrolled .head-bar { background: rgba(255,255,255,0.94); }
 }
 .head-bar__in {
   display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
