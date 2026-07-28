@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Button from "./Button";
 import { Icon, CatIcon } from "./Icon";
 import { catalogUrl, plural } from "../lib/format";
@@ -12,6 +12,7 @@ const BRAND = "Ugodent";
 
 export default function Header() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { categories } = useCatalog();
   const openLead = useLeadModal();
   const { user, isAdmin, logout } = useAuth();
@@ -23,16 +24,39 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [overHero, setOverHero] = useState(false);
   const catsRef = useRef(null);
   const searchRef = useRef(null);
 
-  /* Плотнее матовое стекло при скролле */
+  /* Стекло при скролле. Над баннером оно плотное, дальше по странице —
+     заметно прозрачнее: текст в шапке тёмный, и на тёмном кадре баннера
+     прозрачная плашка его съедает, а над светлым телом страницы — нет. */
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
+    let queued = false;
+    const measure = () => {
+      queued = false;
+      setScrolled(window.scrollY > 8);
+      const hero = document.querySelector(".mc-banner");
+      setOverHero(!!hero && hero.getBoundingClientRect().bottom > 96);
+    };
+    const onScroll = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(measure);
+    };
+    measure();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    window.addEventListener("resize", onScroll);
+    /* баннеры приходят с бэкенда уже после первого рендера — без этого
+       над только что появившимся баннером шапка осталась бы прозрачной */
+    const mo = new MutationObserver(onScroll);
+    mo.observe(document.body, { childList: true, subtree: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      mo.disconnect();
+    };
+  }, [pathname]);
 
   /* Тап мимо мегаменю закрывает его */
   useEffect(() => {
@@ -82,7 +106,11 @@ export default function Header() {
   };
 
   return (
-    <header className={"site-head" + (scrolled ? " is-scrolled" : "")}>
+    <header
+      className={
+        "site-head" + (scrolled ? " is-scrolled" : "") + (overHero ? " is-over-hero" : "")
+      }
+    >
       <div className="head-bar">
         <div className="wrap head-bar__in">
           {/* Левая навигация */}

@@ -249,16 +249,24 @@ img { max-width: 100%; display: block; }
   border-radius: 0;
   transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, border-radius 0.3s ease, backdrop-filter 0.3s ease;
 }
-/* при скролле — прозрачнее, но сильнее размытие: контент под плашкой
-   просвечивает. brightness подсвечивает подложку — без него тёмная картинка
-   баннера съедала контраст левой навигации */
+/* При скролле плашка становится стеклянной. Режима два, потому что текст
+   в шапке тёмный: над светлым телом страницы можно позволить слабое
+   размытие — сквозь плашку видно, как под ней проезжают заголовки и
+   карточки. Над тёмным кадром баннера то же самое съело бы контраст
+   логотипа и навигации, поэтому там стекло плотнее и сильнее осветляет
+   подложку. Класс is-over-hero вешает Header по геометрии баннера. */
 .site-head.is-scrolled .head-bar {
-  background: color-mix(in oklab, var(--accent) 8%, rgba(255,255,255,0.16));
-  -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.55);
-  backdrop-filter: blur(40px) saturate(180%) brightness(1.55);
+  background: color-mix(in oklab, var(--accent) 7%, rgba(255,255,255,0.12));
+  -webkit-backdrop-filter: blur(11px) saturate(180%) brightness(1.16);
+  backdrop-filter: blur(11px) saturate(180%) brightness(1.16);
   border-color: rgba(255,255,255,0.5);
   border-radius: var(--r-lg);
   box-shadow: 0 14px 38px -22px rgba(13,76,94,0.3), 0 1px 0 rgba(255,255,255,0.6) inset;
+}
+.site-head.is-scrolled.is-over-hero .head-bar {
+  background: color-mix(in oklab, var(--accent) 8%, rgba(255,255,255,0.16));
+  -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.55);
+  backdrop-filter: blur(40px) saturate(180%) brightness(1.55);
 }
 /* без backdrop-filter полупрозрачная плашка нечитаема — возвращаем плотный фон */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
