@@ -253,9 +253,9 @@ img { max-width: 100%; display: block; }
    просвечивает. brightness подсвечивает подложку — без него тёмная картинка
    баннера съедала контраст левой навигации */
 .site-head.is-scrolled .head-bar {
-  background: color-mix(in oklab, var(--accent) 8%, rgba(255,255,255,0.34));
-  -webkit-backdrop-filter: blur(34px) saturate(190%) brightness(1.22);
-  backdrop-filter: blur(34px) saturate(190%) brightness(1.22);
+  background: color-mix(in oklab, var(--accent) 8%, rgba(255,255,255,0.16));
+  -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.55);
+  backdrop-filter: blur(40px) saturate(180%) brightness(1.55);
   border-color: rgba(255,255,255,0.5);
   border-radius: var(--r-lg);
   box-shadow: 0 14px 38px -22px rgba(13,76,94,0.3), 0 1px 0 rgba(255,255,255,0.6) inset;
