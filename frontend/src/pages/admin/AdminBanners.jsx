@@ -23,6 +23,33 @@ const TONE_OPTIONS = [
   { key: "azure", label: "Лазурный" },
 ];
 
+/* Куда ведёт баннер: готовые варианты вместо ручного ввода адреса. */
+const LINK_KINDS = [
+  { key: "none", label: "Без ссылки" },
+  { key: "catalog", label: "Весь каталог" },
+  { key: "category", label: "Категория" },
+  { key: "product", label: "Карточка товара" },
+  { key: "custom", label: "Свой адрес" },
+];
+
+function parseLink(url) {
+  if (!url) return { kind: "none", value: "" };
+  if (url === "/catalog") return { kind: "catalog", value: "" };
+  const cat = /^\/catalog\?cat=([a-z0-9-]+)$/.exec(url);
+  if (cat) return { kind: "category", value: cat[1] };
+  const prod = /^\/product\/([a-z0-9-]+)$/.exec(url);
+  if (prod) return { kind: "product", value: prod[1] };
+  return { kind: "custom", value: url };
+}
+
+function buildLink(kind, value) {
+  if (kind === "catalog") return "/catalog";
+  if (kind === "category") return value ? `/catalog?cat=${value}` : "";
+  if (kind === "product") return value ? `/product/${value}` : "";
+  if (kind === "custom") return value.trim();
+  return "";
+}
+
 export default function AdminBanners() {
   const toast = useToast();
   const [banners, setBanners] = useState(null);
@@ -32,6 +59,8 @@ export default function AdminBanners() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [cats, setCats] = useState([]);
+  const [prods, setProds] = useState([]);
   const fileRef = useRef(null);
 
   const load = async () => {
@@ -44,6 +73,12 @@ export default function AdminBanners() {
   };
 
   useEffect(() => { load(); }, []);
+
+  /* Списки для выбора цели ссылки */
+  useEffect(() => {
+    api.getCategories().then(setCats).catch(() => setCats([]));
+    api.getProducts({ size: 100 }).then((p) => setProds(p?.content || [])).catch(() => setProds([]));
+  }, []);
 
   const uploadPhoto = async (file) => {
     if (!file) return;
@@ -63,7 +98,7 @@ export default function AdminBanners() {
   const openCreate = () => {
     setFormErrors({});
     const nextOrder = banners?.length ? Math.max(...banners.map((b) => b.sortOrder ?? 0)) + 1 : 1;
-    setEditing({ banner: null, form: { ...EMPTY_FORM, sortOrder: nextOrder } });
+    setEditing({ banner: null, form: { ...EMPTY_FORM, sortOrder: nextOrder }, link: { kind: "none", value: "" } });
   };
 
   const openEdit = (b) => {
@@ -80,8 +115,15 @@ export default function AdminBanners() {
         sortOrder: b.sortOrder ?? 0,
         active: b.active !== false,
       },
+      link: parseLink(b.linkUrl || ""),
     });
   };
+
+  const setLink = (patch) =>
+    setEditing((ed) => {
+      const link = { ...ed.link, ...patch };
+      return { ...ed, link, form: { ...ed.form, linkUrl: buildLink(link.kind, link.value) } };
+    });
 
   const setF = (key) => (e) =>
     setEditing((ed) => ({ ...ed, form: { ...ed.form, [key]: e.target.value } }));
@@ -290,11 +332,72 @@ export default function AdminBanners() {
                 <input type="text" value={editing.form.ctaLabel} onChange={setF("ctaLabel")} placeholder="Открыть каталог" />
               </label>
 
-              <label className={"field" + (formErrors.linkUrl ? " field--err" : "")}>
-                <span className="field__lbl">Ссылка кнопки</span>
-                <input type="text" value={editing.form.linkUrl} onChange={setF("linkUrl")} placeholder="/catalog?cat=implantaty" />
+              <div className={"field" + (formErrors.linkUrl ? " field--err" : "")}>
+                <span className="field__lbl">
+                  Куда ведёт баннер <small>(кликабелен весь слайд, не только кнопка)</small>
+                </span>
+                <div className="link-picker">
+                  {LINK_KINDS.map((k) => (
+                    <button
+                      key={k.key}
+                      type="button"
+                      className={"link-picker__item" + (editing.link.kind === k.key ? " is-active" : "")}
+                      onClick={() => setLink({ kind: k.key, value: "" })}
+                    >
+                      {k.label}
+                    </button>
+                  ))}
+                </div>
+
+                {editing.link.kind === "category" && (
+                  <select
+                    className="admin-select"
+                    value={editing.link.value}
+                    onChange={(e) => setLink({ value: e.target.value })}
+                  >
+                    <option value="">— выберите категорию —</option>
+                    {cats
+                      .filter((c) => !c.parentId)
+                      .map((top) => (
+                        <optgroup key={top.id} label={top.title}>
+                          <option value={top.slug}>{top.title} — весь раздел</option>
+                          {cats
+                            .filter((c) => c.parentId === top.id)
+                            .map((sub) => (
+                              <option key={sub.id} value={sub.slug}>&nbsp;&nbsp;{sub.title}</option>
+                            ))}
+                        </optgroup>
+                      ))}
+                  </select>
+                )}
+
+                {editing.link.kind === "product" && (
+                  <select
+                    className="admin-select"
+                    value={editing.link.value}
+                    onChange={(e) => setLink({ value: e.target.value })}
+                  >
+                    <option value="">— выберите товар —</option>
+                    {prods.map((p) => (
+                      <option key={p.id} value={p.slug}>{p.title}</option>
+                    ))}
+                  </select>
+                )}
+
+                {editing.link.kind === "custom" && (
+                  <input
+                    type="text"
+                    value={editing.link.value}
+                    onChange={(e) => setLink({ value: e.target.value })}
+                    placeholder="/catalog?cat=sterilizatsiya"
+                  />
+                )}
+
+                {editing.form.linkUrl && (
+                  <span className="field__hint">Адрес: <code>{editing.form.linkUrl}</code></span>
+                )}
                 {err("linkUrl")}
-              </label>
+              </div>
 
               <div className={"field" + (formErrors.tone ? " field--err" : "")}>
                 <span className="field__lbl">Фон <small>(виден, если нет фото)</small></span>

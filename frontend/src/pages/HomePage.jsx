@@ -75,6 +75,16 @@ function Hero() {
           >
             {s.img && <img className="mc-banner__img" src={s.img} alt="" loading={i === 0 ? "eager" : "lazy"} />}
             <div className="mc-banner__scrim" aria-hidden />
+            {/* Весь слайд кликабельный: ведёт туда же, куда кнопка */}
+            {s.to && (
+              <button
+                type="button"
+                className="mc-banner__hit"
+                aria-label={s.title}
+                tabIndex={i === active ? 0 : -1}
+                onClick={() => navigate(s.to)}
+              />
+            )}
             <div className="mc-banner__copy">
               {s.eyebrow && <span className="mc-banner__eyebrow">{s.eyebrow}</span>}
               <h1 className="mc-banner__title">{s.title}</h1>
